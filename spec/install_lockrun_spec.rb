@@ -54,7 +54,7 @@ describe 'duplicity-backup::install_lockrun' do
   
   it "links the executable from /usr/local/bin" do
     chef_run.should create_link("/usr/local/bin/lockrun").with(
-      :target_file => "/usr/local/othersrc/lockrun/lockrun"
+      :to => "/usr/local/othersrc/lockrun/lockrun"
     )
   end
   

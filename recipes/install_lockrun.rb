@@ -44,6 +44,6 @@ execute "gcc lockrun.c -o lockrun" do
 end
 
 link "/usr/local/bin/lockrun" do
-  action      :create
-  target_file "#{src_dir}/lockrun"
+  action :create
+  to     "#{src_dir}/lockrun"
 end
