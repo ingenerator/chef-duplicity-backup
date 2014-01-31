@@ -10,6 +10,8 @@ version '0.1.0'
   supports os
 end
 
+depends "python"
+
 # For automatic setup of database backup users
 suggests "database"
 suggests "mysql"

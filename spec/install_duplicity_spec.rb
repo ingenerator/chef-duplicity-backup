@@ -7,7 +7,15 @@ describe 'duplicity-backup::install_duplicity' do
       node.set['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.22/+download/duplicity-0.6.22.tar.gz'
       node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
     end.converge(described_recipe)
-  end    
+  end
+  
+  it "installs pip" do
+    chef_run.should include_recipe "python::pip"
+  end
+  
+  it "installs the pip lockfile package" do
+    chef_run.should install_python_pip "lockfile"
+  end
 
   it "installs ncftp" do
     chef_run.should install_package "ncftp"
