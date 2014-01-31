@@ -38,8 +38,8 @@ duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
           --name mysql_backup \
-          --allow-source-mismatch 
-          "$MYSQLTMPDIR"
+          --allow-source-mismatch \
+          "$MYSQLTMPDIR" \
           "<%=node['duplicity']['db_destination'] %>"
 
 rm -rf "$MYSQLTMPDIR"
@@ -72,3 +72,7 @@ duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
           "<%=node['duplicity']['file_destination'] %>"
+
+echo ":):):):):):):):):):):):):):):):):):):):):):):)"
+echo "Backup Successful"
+echo ":):):):):):):):):):):):):):):):):):):):):):):)"
