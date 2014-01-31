@@ -61,28 +61,124 @@ Attributes
 There are several attributes that you *must* set before this recipe will work. We recommend using an encrypted data bag to
 store these, for obvious reasons.
 
-| Attribute                                    | Set to                                                                                      |
-|----------------------------------------------|---------------------------------------------------------------------------------------------|
-| `node['duplicity']['backup_passphrase']`     | The GnuPG passphrase to use for your backup                                                 |
-| `node['duplicity']['duplicity_environment']` | A hash of environment variables to set for the duplicity backup run (eg for authentication) |
-| `node['duplicity']['file_destination']`      | The remote path where your files should be backed up                                        |
-| `node['duplicity']['db_destination']`        | The remote path where your database dumps should be backed up                               |
-| `node['duplicity']['backup_mysql']`          | True to enable backup of a mysql database                                                   |
-| `node['duplicity']['mysql']['user']`         | The mysql user to run backups as - this user will be created and granted full read access   |
-| `node['duplicity']['mysql']['password']`     | Password for the mysql user account                                                         |
-| `node['duplicity']['full_if_older_than']     | How often to run a full backup - backups in between will be incremental. See http://duplicity.nongnu.org/duplicity.1.html#sect9 |
-| `node['duplicity']['keep_n_full']            | The number of full backups to keep - older backups will be purged                           |
-| `node['duplicity']['schedule']`              | A cron schedule for your backup task - a hash of {day, hour, minute, month, weekday}        |
-| `node['duplicity']['mailto']`                | What the cron MAILTO variable should be set to                                              |
+If any of these attributes are not set, the cookbook will raise an ArgumentError.
+
+| Attribute                                    | Set to                                                                                        |
+|----------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `node['duplicity']['backup_passphrase']`     | The GnuPG passphrase to use for your backup                                                   |
+| `node['duplicity']['duplicity_environment']` | A hash of environment variables to set for the duplicity backup run (eg for authentication)   |
+| `node['duplicity']['file_destination']`      | The remote path where your files should be backed up                                          |
+| `node['duplicity']['db_destination']`        | The remote path where your database dumps should be backed up                                 |
+| `node['duplicity']['backup_mysql']`          | True to enable backup of a mysql database                                                     |
+| `node['duplicity']['mysql']['password']`     | Password for the mysql user account that will run backups - the username defaults to 'backup' |
+| `node['duplicity']['full_if_older_than']`    | How often to run a full backup - backups in between will be incremental. See http://duplicity.nongnu.org/duplicity.1.html#sect9 |
+| `node['duplicity']['keep_n_full']`           | The number of full backups to keep - older backups will be purged                             |
+| `node['duplicity']['schedule']`              | A cron schedule for your backup task - a hash of {day, hour, minute, month, weekday}          |
+
 
 Other attributes are available to provide more control - see the attributes files in the cookbook for more details.
 
-We generally backup to an S3 bucket. To make this work, provide a destination URL like `s3+http://{bucket-name}/{path-in-bucket}`. You will also
-need to provide AWS credentials - an AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY - which should be added to the `duplicity_environment` hash. We
-suggest creating an IAM user specifically for this job and storing the credentials in an encrypted data bag.
+Configuring for backup to S3
+----------------------------
+Our usual strategy is to backup to an S3 bucket for the project, with separate paths in the bucket for the database and file backups. If there
+are multiple servers with file backups then we'll use a different destination path for each role - but usually we're only interested in uploaded
+user content, custom instance configuration and databases as everything else on the instance is provisioned from source control.
 
-**Note that by default - because we're over this side of the world - the default configuration we use for an S3 destination is for european
-  buckets. You may want to set `node['duplicity']['s3-european-buckets']` false to avoid that.**
+To get this working:
+### Create an S3 bucket for the backups
+
+Create a bucket on EC2 and store the destination in your role attributes. For a bucket `my-app-backup` you'll want to set:
+
+```ruby
+node.default['duplicity']['file_destination'] = 's3+http://my-app-backup/files'
+node.default['duplicity']['db_destination'] = 's3+http://my-app-backup/database'
+```
+
+**We default to setting the --s3-european-buckets flag for duplicity. This should work with buckets outside the EU as well, but
+  if you have issues you can set `node['duplicity']['s3-european-buckets']` to false.**
+
+### Create an IAM user for the application backups
+
+You should create a separate AWS IAM user for the application backups, with only the required S3 permissions. This user's keys will be stored
+in plain text on disk, so should be as restricted as possible.
+
+Set a policy like:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Sid": "Stmt1374798157000",
+      "Resource": [
+        "arn:aws:s3:::my-app-backup"
+      ],
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Sid": "Stmt1374798157001",
+      "Resource": [
+        "arn:aws:s3:::my-app-backup/*"
+      ],
+      "Effect": "Allow"
+    }
+  ]
+}
+```
+
+Grab the user's access key and secret access key and add them to your role attributes like this:
+
+```ruby
+# Note: you almost certainly want to store these in an encrypted data bag, not in plain text in your repo...
+node.default['duplicity']['duplicity_environment']['AWS_ACCESS_KEY_ID'] = 'foo'
+node.default['duplicity']['duplicity_environment']['AWS_SECRET_ACCESS_KEY'] = 'bar'
+```
+
+### Set the general configuration for file backups
+
+```ruby
+# -- Configure the list of files to include
+# Note we use a hash to make merging more predictable, and to allow you to disable a path in a higher cookbook
+# Set the value false and the pattern will be skipped.
+node.default['duplicity']['globbing_file_patterns']['/var/www/uploads'] = true
+
+# You can also exclude particular file patterns
+node.default['duplicity']['globbing_file_patterns']['- /var/www/uploads/.thumbs'] = true
+
+# Set a passphrase to protect your backup - again, from an encrypted data bag ideally
+node.default['duplicity']['backup_passphrase'] = 'abcdefg'
+
+# Configure how often to take a full backup (incremental backups will be performed between these runs)
+# This takes a full backup every 5 days
+node.default['duplicity']['full_if_older_than'] = '5D'
+
+# Configure how many successful full backups to keep (older ones will be purged)
+node.default['duplicity']['keep_n_full'] = 5
+
+# And configure the backup cron schedule - any missing schedule columns will be set to '*'
+# This entry (with no other attributes) will run daily at 3am
+node.default['duplicity']['schedule']['hour'] = 3
+```
+
+### Set the general configuration for database backups
+```ruby
+# Activate backups
+node.default['duplicity']['backup_mysql'] = true
+
+# Choose a password for the database backup user that will be created by this cookbook
+node.default['duplicity']['mysql']['password'] = 'from-an-encrypted-data-bag'
+
+# Optionally, if you have tables not using innodb, disable the single-transaction flag to mysqldump
+# This is the only reliable way to dump eg MyISAM, but requires a global lock which will impact production performance
+# If you're doing this, consider running a replicated slave to backup from instead
+node.default['duplicity']['mysql']['innodb_only'] = false
+```
 
 ### Testing
 See the [.travis.yml](.travis.yml) file for the current test scripts.
