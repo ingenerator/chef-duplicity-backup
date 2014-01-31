@@ -4,6 +4,12 @@ describe 'duplicity-backup::default' do
   let (:chef_run) do
     ChefSpec::Runner.new do | node |
       # Define the required attributes that we'll fail without
+      node.set['duplicity']['backup_passphrase']  = 'pass'
+      node.set['duplicity']['db_destination']     = 's3+http://bucket/dbpath'
+      node.set['duplicity']['file_destination']   = 's3+http://bucket/filepath'
+      node.set['duplicity']['keep_n_full']        = '5'
+      node.set['duplicity']['full_if_older_than'] = '7D'
+      node.set['duplicity']['mysql']['user']      = 'backup'
       node.set['duplicity']['schedule']     = {
         'minute'  => 1,
         'hour'    => 2,

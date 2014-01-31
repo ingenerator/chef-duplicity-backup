@@ -35,7 +35,7 @@ default['duplicity']['duplicity_environment'] = node['duplicity']['duplicity_env
 
 # Configuration for a mysql dump to be run before backing up
 default['duplicity']['backup_mysql']   = false
-default['duplicity']['mysql_user']     = nil
+default['duplicity']['mysql_user']     = 'backup'
 default['duplicity']['mysql_password'] = nil
 # Set innodb_only false if you are using any tables with other storage engines
 # This will disable the use of the --single-transaction mysqldump mode which will otherwise allow you to backup innodb without long locks
@@ -47,10 +47,10 @@ default['duplicity']['db_destination']   = nil
 default['duplicity']['file_destination'] = nil
 
 # Set how often a full backup (rather than incremental) should be run
-default['duplicity']['full_if_older_than'] = '7D'
+default['duplicity']['full_if_older_than'] = nil
 
 # Set how many full backup sets should be kept
-default['duplicity']['keep_n_full']        = 5
+default['duplicity']['keep_n_full']        = nil
 
 # Use S3 european buckets
 default['duplicity']['s3-european-buckets'] = true

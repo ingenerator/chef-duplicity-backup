@@ -20,6 +20,20 @@
 # limitations under the License.
 #
 
+# Validate the attributes
+required_attributes = %w{ backup_passphrase file_destination keep_n_full full_if_older_than }
+if node['duplicity']['backup_mysql'] then
+  required_attributes << 'db_destination'
+  
+  %w{ user password }.each do | key |
+    raise ArgumentError, "You must set node['duplicity']['mysql']['#{key}']" unless node['duplicity']['mysql'][key]
+  end
+
+end
+required_attributes.each do | key |
+  raise ArgumentError, "You must set node['duplicity']['#{key}']" unless node['duplicity'][key]
+end
+
 directory "/etc/duplicity" do
   action :create
   mode   0755
