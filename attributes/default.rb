@@ -34,9 +34,9 @@ default['duplicity']['backup_passphrase'] = nil
 default['duplicity']['duplicity_environment'] = node['duplicity']['duplicity_environment'] || {}
 
 # Configuration for a mysql dump to be run before backing up
-default['duplicity']['backup_mysql']   = false
-default['duplicity']['mysql_user']     = 'backup'
-default['duplicity']['mysql_password'] = nil
+default['duplicity']['backup_mysql']      = false
+default['duplicity']['mysql']['user']     = 'backup'
+default['duplicity']['mysql']['password'] = nil
 # Set innodb_only false if you are using any tables with other storage engines
 # This will disable the use of the --single-transaction mysqldump mode which will otherwise allow you to backup innodb without long locks
 default['duplicity']['mysql']['innodb_only'] = true
