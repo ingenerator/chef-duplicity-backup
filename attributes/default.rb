@@ -24,3 +24,19 @@ default['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-serie
 # The local directory to place the source
 default['duplicity']['src_dir'] = '/usr/local/src'
 
+# The globbing patterns for file backup
+default['duplicity']['globbing_file_patterns'] = node['duplicity']['globbing_file_patterns'] || {}
+
+
+# Configuration for a mysql dump to be run before backing up
+default['duplicity']['backup_mysql']   = false
+default['duplicity']['mysql_user']     = nil
+default['duplicity']['mysql_password'] = nil
+# Set innodb_only false if you are using any tables with other storage engines
+# This will disable the use of the --single-transaction mysqldump mode which will otherwise allow you to backup innodb without long locks
+default['duplicity']['mysql']['innodb_only'] = true
+
+
+# Remote backup destinations - see the duplicity documentation for options
+default['duplicity']['db_destination']   = nil
+default['duplicity']['file_destination'] = nil

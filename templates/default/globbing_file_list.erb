@@ -1,0 +1,8 @@
+<%# Generates the globbing file list template for duplicity. This can have include and 
+    exclude patterns - begin a line with `-` to mark as exclude. See
+    http://duplicity.nongnu.org/duplicity.1.html#sect10 for full details %>
+<% node['duplicity']['globbing_file_patterns'].each do | pattern, should_include | %>
+<% if should_include %>
+<%=pattern%>
+<% end %>
+<% end %>
