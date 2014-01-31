@@ -30,11 +30,11 @@ describe 'duplicity-backup::install_duplicity' do
   end
   
   it "installs python-dev" do
-    chef_run.should install_package "python-boto"
+    chef_run.should install_package "python-dev"
   end
   
   it "installs librsync-dev" do
-    chef_run.should install_package "python-boto"
+    chef_run.should install_package "librsync-dev"
   end
   
   it "fetches the remote source if missing" do

@@ -26,6 +26,8 @@ package "python-paramiko"
 package "python-pycryptopp"
 package "lftp"
 package "python-boto"
+package "python-dev"
+package "librsync-dev"
 
 src_name = File.basename(node['duplicity']['src_url'])
 src_path = File.join(node['duplicity']['src_dir'], src_name)
