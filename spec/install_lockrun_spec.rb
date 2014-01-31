@@ -22,7 +22,7 @@ describe 'duplicity-backup::install_lockrun' do
   end
   
   it "copies the lockrun.c source file to the source dir" do
-    chef_run.should create_file("/usr/local/othersrc/lockrun/lockrun.c").with(
+    chef_run.should create_cookbook_file("/usr/local/othersrc/lockrun/lockrun.c").with(
       :owner  => "root",
       :group  => "root", 
       :mode    => 0644

@@ -29,7 +29,7 @@ directory src_dir do
   recursive true
 end
 
-file "#{src_dir}/lockrun.c" do
+cookbook_file "#{src_dir}/lockrun.c" do
   action    :create
   owner     "root"
   group     "root"
