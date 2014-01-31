@@ -12,6 +12,9 @@ function error_handler()
 }
 trap 'error_handler' ERR
 
+echo "Loading credentials and environment"
+source /etc/duplicity/environment.sh
+
 <% if node['duplicity']['backup_mysql'] %>
 echo "Creating database dump"
 
@@ -23,25 +26,49 @@ for db in $DBS
 do
   if [ "$db" != "information_schema" ]; then
     echo " * Dumping mySQL database $db"
-    mysqldump --defaults-file=/etc/duplicity/mysql.cnf -h localhost <%=node['duplicity']['mysql']['innodb_only'] ? '--single-transaction' : '' %> $db | gzip -9 > $MYSQLTMPDIR/mysql-$db.sql.gz
+    mysqldump --defaults-file=/etc/duplicity/mysql.cnf \
+              -h localhost \
+              <%=node['duplicity']['mysql']['innodb_only'] ? '--single-transaction' : '' %> \
+              "$db" | gzip -9 > "$MYSQLTMPDIR/mysql-$db.sql.gz"
   fi
 done
 
 echo "Backing up database dump"
-$DUPLICITY --full-if-older-than $FULLDAYS $S3OPTIONS $EXTRADUPLICITYOPTIONS --name mysql_backup --allow-source-mismatch $MYSQLTMPDIR $S3MYSQLLOCATION
+duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
+          --s3-use-new-style \
+          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
+          --name mysql_backup \
+          --allow-source-mismatch 
+          "$MYSQLTMPDIR"
+          "<%=node['duplicity']['db_destination'] %>"
 
-rm -rf $MYSQLTMPDIR
+rm -rf "$MYSQLTMPDIR"
+
+echo "Cleaning old full database backups"
+duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
+          --force \
+          --s3-use-new-style \
+          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
+          "<%=node['duplicity']['db_destination'] %>"
 
 <% end %>
 
 ### File backup ###
 echo "Backing up files"
-duplicity --full-if-older-than $FULLDAYS $S3OPTIONS $EXTRADUPLICITYOPTIONS --name file_backup --include-globbing-filelist --exclude '**' / $S3FILESYSLOCATION
+duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
+          --s3-use-new-style \
+          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
+          --name file_backup \
+          --include-globbing-filelist /etc/duplicity/globbing_file_list \
+          --exclude '**' \
+          / \
+          "<%=node['duplicity']['file_destination'] %>"
 
 
 ### Old backup cleanup ###
 echo "Cleaning old full backups"
-duplicity remove-all-but-n-full $MAXFULL --force $S3OPTIONS $EXTRADUPLICITYOPTIONS $S3FILESYSLOCATION
-
-echo "Cleaning old full database backups"
-duplicity remove-all-but-n-full $MAXFULL --force $S3OPTIONS $EXTRADUPLICITYOPTIONS $S3MYSQLLOCATION
+duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
+          --force \
+          --s3-use-new-style \
+          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
+          "<%=node['duplicity']['file_destination'] %>"

@@ -27,6 +27,7 @@ directory "/etc/duplicity" do
   group  "root"
 end
 
+# The list of files to include or exclude
 template "/etc/duplicity/globbing_file_list" do
   action :create
   mode   0644
@@ -34,9 +35,26 @@ template "/etc/duplicity/globbing_file_list" do
   group  "root"
 end
 
+# The backup script itself - this will become the cron target
 template "/etc/duplicity/backup.sh" do
   action :create
   mode   0744
+  owner  "root"
+  group  "root"
+end
+
+# Environment variables to provide to duplicity (eg AWS keys)
+template "/etc/duplicity/environment.sh" do
+  action :create
+  mode   0700
+  owner  "root"
+  group  "root"
+end
+
+# Mysql credentials for the backup script
+template "/etc/duplicity/mysql.cnf" do
+  action :create
+  mode   0600
   owner  "root"
   group  "root"
 end
