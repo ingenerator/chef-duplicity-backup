@@ -13,5 +13,5 @@ end
 depends "python"
 
 # For automatic setup of database backup users
-suggests "database"
-suggests "mysql"
+depends "database"
+depends "mysql"
