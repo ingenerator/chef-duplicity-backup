@@ -191,10 +191,6 @@ describe 'duplicity-backup::configure_backup' do
         expect_argument_error_without('db_destination')
       end
 
-      it "fails without a mysql.user" do
-        expect_argument_error_without('mysql.user')
-      end
-
       it "fails without a mysql.password" do
         expect_argument_error_without('mysql.password')
       end
