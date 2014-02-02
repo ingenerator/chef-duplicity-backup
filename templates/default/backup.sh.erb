@@ -34,7 +34,7 @@ do
 done
 
 echo "Backing up database dump"
-duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
+/usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
           --name mysql_backup \
@@ -45,7 +45,7 @@ duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
 rm -rf "$MYSQLTMPDIR"
 
 echo "Cleaning old full database backups"
-duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
+/usr/local/bin/duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
           --force \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
@@ -55,7 +55,7 @@ duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
 
 ### File backup ###
 echo "Backing up files"
-duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
+/usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
           --name file_backup \
@@ -67,7 +67,7 @@ duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
 
 ### Old backup cleanup ###
 echo "Cleaning old full backups"
-duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
+/usr/local/bin/duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
           --force \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \

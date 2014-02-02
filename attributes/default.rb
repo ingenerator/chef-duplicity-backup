@@ -56,7 +56,7 @@ default['duplicity']['keep_n_full']        = nil
 default['duplicity']['s3-european-buckets'] = true
 
 # The cron command - customise to make this run something else, or to prepend environment vars/loggers/etc
-default['duplicity']['cron_command'] = 'lockrun --lockfile=/var/run/duplicity_backup.lockrun -- /etc/duplicity/backup.sh'
+default['duplicity']['cron_command'] = '/usr/local/bin/lockrun --lockfile=/var/run/duplicity_backup.lockrun -- /etc/duplicity/backup.sh'
 
 # Customise the mail recipient - otherwise will be system default
 default['duplicity']['mailto'] = nil

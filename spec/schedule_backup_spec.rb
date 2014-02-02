@@ -71,7 +71,7 @@ describe 'duplicity-backup::schedule_backup' do
     
     it "runs duplicity inside lockrun to prevent collisions" do
       chef_run.should create_cron("duplicity_backup").with({
-        :command => 'lockrun --lockfile=/var/run/duplicity_backup.lockrun -- /etc/duplicity/backup.sh'
+        :command => '/usr/local/bin/lockrun --lockfile=/var/run/duplicity_backup.lockrun -- /etc/duplicity/backup.sh'
       })
     end
         
