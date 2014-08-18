@@ -16,7 +16,7 @@ Installation
 We recommend adding to your `Berksfile` and using [Berkshelf](http://berkshelf.com/):
 
 ```ruby
-cookbook 'duplicity-backup', git: 'git://github.com/ingenerator/duplicity-backup', branch: 'master'
+cookbook 'duplicity-backup', git: 'git://github.com/ingenerator/chef-duplicity-backup', branch: 'master'
 ```
 
 Have your main project cookbook *depend* on duplicity-backup by editing the `metadata.rb` for your cookbook. 
