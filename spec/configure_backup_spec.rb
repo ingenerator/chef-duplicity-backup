@@ -5,16 +5,22 @@ describe 'duplicity-backup::configure_backup' do
     {
         'backup_passphrase'  => 'pass',
         'db_destination'     => 's3+http://bucket/dbpath',
+        'pg_destination'     => 's3+http://bucket/pgdest',
         'file_destination'   => 's3+http://bucket/filepath',
         'keep_n_full'        => '5',
         'full_if_older_than' => '7D',
         'mysql'             => {
           'user'     => 'backupuser',
           'password' => 'mysqlpass'
+        },
+        'postgresql'       => {
+          'user'     => 'backupuser',
+          'password' => 'backuppass'
         }
     }
   end
   let (:backup_mysql)        { false }
+  let (:backup_postgresql)   { false }
   let (:innodb_only)         { true }
   let (:s3_european_buckets) { true }
 
@@ -25,6 +31,7 @@ describe 'duplicity-backup::configure_backup' do
         # Set non-standard attributes to check the recipe is using the attributes
         custom_attributes['globbing_file_patterns'] = {'/var/www/uploads' => true,'/var/something' => true}
         custom_attributes['backup_mysql']           = backup_mysql
+        custom_attributes['backup_postgresql']      = backup_postgresql
         custom_attributes['file_destination']       = 's3+http://ourbackup/filebackup'
         custom_attributes['full_if_older_than']     = '10D'
         custom_attributes['keep_n_full']            = 10
@@ -98,6 +105,24 @@ describe 'duplicity-backup::configure_backup' do
       context "when backup_mysql is not set" do
         it "does not include any mysql commands" do
           chef_run.should_not render_file('/etc/duplicity/backup.sh').with_content(/mysql/)
+        end
+      end
+
+      context "when backup_postgresql is set" do
+        let (:backup_postgresql) { true }
+
+        it "performs a pg_dumpall before running the backup" do
+          chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/pg\_dumpall/)
+        end
+
+        it "includes backing up the pgdump_all as a separate backup job" do
+          chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/duplicity.+?"s3\+http:\/\/bucket\/pgdest"\n/m)
+        end
+      end
+
+      context "when backup_postgresql is not set" do
+        it "does not include pgdump_all command" do
+          chef_run.should_not render_file('/etc/duplicity/backup.sh').with_content(/pgdump\_all/)
         end
       end
 
