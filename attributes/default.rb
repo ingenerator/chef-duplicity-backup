@@ -41,9 +41,17 @@ default['duplicity']['mysql']['password'] = nil
 # This will disable the use of the --single-transaction mysqldump mode which will otherwise allow you to backup innodb without long locks
 default['duplicity']['mysql']['innodb_only'] = true
 
+# Configuration for a postgresql dump to be run before backing up
+default['duplicity']['backup_postgresql']       = false
+default['duplicity']['postgresql']['host']      = 'localhost'
+default['duplicity']['postgresql']['port']      = 5432
+default['duplicity']['postgresql']['user']      = nil
+default['duplicity']['postgresql']['password']  = nil
+
 
 # Remote backup destinations - see the duplicity documentation for options
 default['duplicity']['db_destination']   = nil
+default['duplicity']['pg_destination']   = nil
 default['duplicity']['file_destination'] = nil
 
 # Set how often a full backup (rather than incremental) should be run

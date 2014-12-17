@@ -16,7 +16,7 @@ echo "Loading credentials and environment"
 source /etc/duplicity/environment.sh
 
 <% if node['duplicity']['backup_mysql'] %>
-echo "Creating database dump"
+echo "Creating mysql database dump"
 
 # Create temp dir that only we can see
 MYSQLTMPDIR="$(mktemp -d)"
@@ -33,7 +33,7 @@ do
   fi
 done
 
-echo "Backing up database dump"
+echo "Backing up mysql database dump"
 /usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
@@ -44,12 +44,42 @@ echo "Backing up database dump"
 
 rm -rf "$MYSQLTMPDIR"
 
-echo "Cleaning old full database backups"
+echo "Cleaning old mysql full database backups"
 /usr/local/bin/duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
           --force \
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
           "<%=node['duplicity']['db_destination'] %>"
+
+<% end %>
+
+### PostgreSQL backup ###
+
+<% if node['duplicity']['backup_postgresql'] %>
+echo "Creating postgresql database dump"
+
+# Create temp dir that only we can see
+POSTGRESTMPDIR="$(mktemp -d)"
+
+PGPASSFILE="/etc/duplicity/.pgpass" pg_dumpall -h<%=node['duplicity']['postgresql']['host'] %> -U<%=node['duplicity']['postgresql']['user'] %> | gzip -9 > "$POSTGRESTMPDIR/pgdump.sql.gz"
+
+echo "Backing up postgresql database dump"
+/usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
+          --s3-use-new-style \
+          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
+          --name pg_backup \
+          --allow-source-mismatch \
+          "$POSTGRESTMPDIR" \
+          "<%=node['duplicity']['pg_destination'] %>"
+
+rm -rf "$POSTGRESTMPDIR"
+
+echo "Cleaning old postgresql full database backups"
+/usr/local/bin/duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
+          --force \
+          --s3-use-new-style \
+          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
+          "<%=node['duplicity']['pg_destination'] %>"
 
 <% end %>
 

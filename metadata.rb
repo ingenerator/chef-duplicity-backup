@@ -10,8 +10,6 @@ version '0.1.0'
   supports os
 end
 
-depends "python"
-
-# For automatic setup of database backup users
-depends "database"
-depends "mysql"
+%w(python database mysql postgresql).each do |d|
+  depends d
+end

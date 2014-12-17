@@ -2,8 +2,8 @@ inGenerator Backup cookbook
 =================================
 [![Build Status](https://travis-ci.org/ingenerator/chef-duplicity-backup.png?branch=master)](https://travis-ci.org/ingenerator/chef-duplicity-backup)
 
-`duplicity-backup` installs and configures [duplicity](http://duplicity.nongnu.org/) to handle remote backup of files 
-and/or databases on a server. It also installs [lockrun](http://www.unixwiz.net/tools/lockrun.html) and 
+`duplicity-backup` installs and configures [duplicity](http://duplicity.nongnu.org/) to handle remote backup of files
+and/or databases on a server. It also installs [lockrun](http://www.unixwiz.net/tools/lockrun.html) and
 uses this to ensure that your duplicity runs never overlap (which can cause resource exhaustion and backup corruption).
 
 Requirements
@@ -19,7 +19,7 @@ We recommend adding to your `Berksfile` and using [Berkshelf](http://berkshelf.c
 cookbook 'duplicity-backup', git: 'git://github.com/ingenerator/chef-duplicity-backup', branch: 'master'
 ```
 
-Have your main project cookbook *depend* on duplicity-backup by editing the `metadata.rb` for your cookbook. 
+Have your main project cookbook *depend* on duplicity-backup by editing the `metadata.rb` for your cookbook.
 
 ```ruby
 # metadata.rb
@@ -42,17 +42,18 @@ include_recipe "duplicity-backup::default"
 
 The default recipe executes the following steps:
 
-| Recipe            | Action                                                                                              |
-|-------------------|-----------------------------------------------------------------------------------------------------|
-| install_duplicity | Installs duplicity itself                                                                           |
-| install_lockrun   | Installs and builds lockrun                                                                         |
-| configure_backup  | Deploys the backup script and file list                                                             |
-| backup_mysql_user | Creates a read-only database user for running backups, if database backup is configured             |
-| schedule_backup   | Creates the cron task(s) for your backup                                                            |
+| Recipe                  | Action                                                                                              |
+|-------------------------|-----------------------------------------------------------------------------------------------------|
+| install_duplicity       | Installs duplicity itself                                                                           |
+| install_lockrun         | Installs and builds lockrun                                                                         |
+| configure_backup        | Deploys the backup script and file list                                                             |
+| backup_mysql_user       | Creates a read-only database user for running backups, if database backup is configured             |
+| backup_postgresql_user  | Creates a PostgreSQL database user for running backups, if database backup is configured            |
+| schedule_backup         | Creates the cron task(s) for your backup                                                            |
 
 **Note that including the backup_mysql_user recipe causes chef to include the mysql client recipe, which will run before
   all other recipes in your cookbook.**
-  
+
 To customise behaviour, include any or all of these recipes directly rather than relying on the default.
 
 Attributes
@@ -69,8 +70,12 @@ If any of these attributes are not set, the cookbook will raise an ArgumentError
 | `node['duplicity']['duplicity_environment']` | A hash of environment variables to set for the duplicity backup run (eg for authentication)   |
 | `node['duplicity']['file_destination']`      | The remote path where your files should be backed up                                          |
 | `node['duplicity']['db_destination']`        | The remote path where your database dumps should be backed up                                 |
+| `node['duplicity']['pg_destination']`        | The remote path where your PostgreSQL database dumps should be backed up                      |
 | `node['duplicity']['backup_mysql']`          | True to enable backup of a mysql database                                                     |
 | `node['duplicity']['mysql']['password']`     | Password for the mysql user account that will run backups - the username defaults to 'backup' |
+| `node['duplicity']['backup_postgresql']`     | True to enable backup of a PostgreSQL database                                                |
+| `node['duplicity']['postgresql']['user']`    | User for the postgresql user account that will run backups                                    |
+| `node['duplicity']['postgresql']['password']`| Password for the postgresql user account that will run backups                                |
 | `node['duplicity']['full_if_older_than']`    | How often to run a full backup - backups in between will be incremental. See http://duplicity.nongnu.org/duplicity.1.html#sect9 |
 | `node['duplicity']['keep_n_full']`           | The number of full backups to keep - older backups will be purged                             |
 | `node['duplicity']['schedule']`              | A cron schedule for your backup task - a hash of {day, hour, minute, month, weekday}          |
@@ -92,6 +97,7 @@ Create a bucket on EC2 and store the destination in your role attributes. For a 
 ```ruby
 node.default['duplicity']['file_destination'] = 's3+http://my-app-backup/files'
 node.default['duplicity']['db_destination'] = 's3+http://my-app-backup/database'
+node.default['duplicity']['pg_destination'] = 's3+http://my-app-backup/pg_database'
 ```
 
 **We default to setting the --s3-european-buckets flag for duplicity. This should work with buckets outside the EU as well, but
@@ -178,6 +184,14 @@ node.default['duplicity']['mysql']['password'] = 'from-an-encrypted-data-bag'
 # This is the only reliable way to dump eg MyISAM, but requires a global lock which will impact production performance
 # If you're doing this, consider running a replicated slave to backup from instead
 node.default['duplicity']['mysql']['innodb_only'] = false
+
+# Activate backup for PostgreSQL
+node.default['duplicity']['backup_postgresql'] = true
+
+# Choose a user and password for the PostgreSQL backup user that will be created by this cookbook
+# WARNING: will be created SUPERUSER user to do pg_dumpall
+node.default['duplicity']['postgresql']['user'] = 'backup_user'
+node.default['duplicity']['postgresql']['password'] = 'from-an-encrypted-data-bag'
 ```
 
 ### Testing

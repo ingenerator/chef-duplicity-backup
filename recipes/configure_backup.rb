@@ -24,9 +24,17 @@
 required_attributes = %w{ backup_passphrase file_destination keep_n_full full_if_older_than }
 if node['duplicity']['backup_mysql'] then
   required_attributes << 'db_destination'
-  
+
   %w{ user password }.each do | key |
     raise ArgumentError, "You must set node['duplicity']['mysql']['#{key}']" unless node['duplicity']['mysql'][key]
+  end
+
+end
+if node['duplicity']['backup_postgresql'] then
+  required_attributes << 'pg_destination'
+
+  %w{ user password }.each do | key |
+    raise ArgumentError, "You must set node['duplicity']['postgresql']['#{key}']" unless node['duplicity']['postgresql'][key]
   end
 
 end
@@ -67,6 +75,15 @@ end
 
 # Mysql credentials for the backup script
 template "/etc/duplicity/mysql.cnf" do
+  action :create
+  mode   0600
+  owner  "root"
+  group  "root"
+end
+
+# PostgreSQL credentials for the backup script
+template "/etc/duplicity/.pgpass" do
+  source "pgpass.erb"
   action :create
   mode   0600
   owner  "root"
