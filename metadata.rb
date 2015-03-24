@@ -10,7 +10,7 @@ version '0.1.0'
   supports os
 end
 
-depends python
-depends database,   '~> 2.3.1'
-depends mysql,      '~>5.6.1'
-depends postgresql
+depends 'python'
+depends 'database',   '~> 2.3.1'
+depends 'mysql',      '~> 5.6.1'
+depends 'postgresql'
