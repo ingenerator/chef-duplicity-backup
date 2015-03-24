@@ -22,16 +22,23 @@ echo "Creating mysql database dump"
 MYSQLTMPDIR="$(mktemp -d)"
 
 DBS="$(mysql --defaults-file=/etc/duplicity/mysql.cnf -h localhost -Bse 'show databases')"
+FOUND_DBS=""
 for db in $DBS
 do
   if [ "$db" != "information_schema" ]; then
     echo " * Dumping mySQL database $db"
+    FOUND_DBS="$FOUND_DBS, $db"
     mysqldump --defaults-file=/etc/duplicity/mysql.cnf \
               -h localhost \
               <%=node['duplicity']['mysql']['innodb_only'] ? '--single-transaction' : '' %> \
               "$db" | gzip -9 > "$MYSQLTMPDIR/mysql-$db.sql.gz"
   fi
 done
+if [ -z "$FOUND_DBS" ]; then
+  echo "No databases found for backup. This probably means your database user has incorrect permissions"
+  echo "If you do not want to backup the database, configure node['duplicity']['backup_mysql'] to false"
+  exit 9
+fi
 
 echo "Backing up mysql database dump"
 /usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
