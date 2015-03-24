@@ -10,6 +10,7 @@ version '0.1.0'
   supports os
 end
 
-%w(python database mysql postgresql).each do |d|
-  depends d
-end
+depends python
+depends database,   '~> 2.3.1'
+depends mysql,      '~>5.6.1'
+depends postgresql
