@@ -33,7 +33,6 @@ if node['duplicity']['backup_mysql'] then
   mysql_database_user node['duplicity']['mysql']['user'] do
     action        :grant
     connection    root_connection
-    database_name '*'
     host          'localhost'
     password      node['duplicity']['mysql']['password']
     privileges    ['SELECT', 'SHOW VIEW', 'TRIGGER', 'LOCK TABLES']
