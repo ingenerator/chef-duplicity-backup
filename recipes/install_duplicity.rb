@@ -45,7 +45,7 @@ remote_file src_path do
 end
 
 # Always build if the executable isn't there - could be a previous failed provision
-default_action = Kernel.system('which duplicity') ? :nothing : :run
+default_action = Kernel.system('which duplicity > /dev/null') ? :nothing : :run
 unpack_dir_name = File.basename(src_name, '.tar.gz')
 
 execute "install-duplicity" do
