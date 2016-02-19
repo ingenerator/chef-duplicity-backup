@@ -74,7 +74,7 @@ describe 'duplicity-backup::install_duplicity' do
   
   context "when the source is unchanged and the executable is present" do
     before(:each) do
-      Kernel.stub(:system).with('which duplicity').and_return(true)
+      Kernel.stub(:system).with('which duplicity > /dev/null').and_return(true)
     end
 
     it "does not attempt to unpack and build the source" do
@@ -84,7 +84,7 @@ describe 'duplicity-backup::install_duplicity' do
   
   context "when the duplicity executable is not present even if the source is unchanged" do
     before(:each) do
-      Kernel.stub(:system).with('which duplicity').and_return(false)
+      Kernel.stub(:system).with('which duplicity > /dev/null').and_return(false)
     end
     
     it "compiles and installs from source" do

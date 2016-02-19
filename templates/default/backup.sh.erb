@@ -96,7 +96,7 @@ echo "Backing up files"
           --s3-use-new-style \
           <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
           --name file_backup \
-          --include-globbing-filelist /etc/duplicity/globbing_file_list \
+          --include-filelist /etc/duplicity/globbing_file_list \
           --exclude '**' \
           / \
           "<%=node['duplicity']['file_destination'] %>"
