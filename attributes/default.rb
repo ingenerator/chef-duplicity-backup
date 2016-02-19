@@ -19,7 +19,7 @@
 #
 
 # URL for the duplicity source
-default['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.23/+download/duplicity-0.6.23.tar.gz'
+default['duplicity']['src_url'] = 'https://code.launchpad.net/duplicity/0.7-series/0.7.06/+download/duplicity-0.7.06.tar.gz'
 
 # local directory to place the source in
 default['duplicity']['src_dir'] = '/usr/local/src'
