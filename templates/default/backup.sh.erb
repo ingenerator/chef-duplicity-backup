@@ -29,6 +29,7 @@ do
     echo " * Dumping mySQL database $db"
     FOUND_DBS="$FOUND_DBS, $db"
     mysqldump --defaults-file=/etc/duplicity/mysql.cnf \
+              --events \
               -h localhost \
               <%=node['duplicity']['mysql']['innodb_only'] ? '--single-transaction' : '' %> \
               "$db" | gzip -9 > "$MYSQLTMPDIR/mysql-$db.sql.gz"
