@@ -76,6 +76,14 @@ describe 'duplicity-backup::install_duplicity' do
     before(:each) do
       Kernel.stub(:system).with('which duplicity > /dev/null').and_return(true)
     end
+    
+    cached (:chef_run) do
+      ChefSpec::SoloRunner.new do | node |
+        # Set non-standard attributes to check the recipe is using the attributes
+        node.set['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.22/+download/duplicity-0.6.22.tar.gz'
+        node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
+      end.converge(described_recipe)
+    end
 
     it "does not attempt to unpack and build the source" do
       chef_run.should_not run_execute('install-duplicity')
@@ -85,6 +93,14 @@ describe 'duplicity-backup::install_duplicity' do
   context "when the duplicity executable is not present even if the source is unchanged" do
     before(:each) do
       Kernel.stub(:system).with('which duplicity > /dev/null').and_return(false)
+    end
+    
+    cached (:chef_run) do
+      ChefSpec::SoloRunner.new do | node |
+        # Set non-standard attributes to check the recipe is using the attributes
+        node.set['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.22/+download/duplicity-0.6.22.tar.gz'
+        node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
+      end.converge(described_recipe)
     end
     
     it "compiles and installs from source" do

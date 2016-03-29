@@ -44,6 +44,13 @@ describe 'duplicity-backup::install_lockrun' do
       stub_command("which lockrun").and_return(false)
     end
     
+    cached (:chef_run) do
+      ChefSpec::SoloRunner.new do | node |
+        # Set non-standard attributes to check the recipe is using the attributes
+        node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
+      end.converge(described_recipe)
+    end 
+
     it "compiles lockrun from source" do
       chef_run.should run_execute("gcc lockrun.c -o lockrun").with(
         :cwd  => "/usr/local/othersrc/lockrun",

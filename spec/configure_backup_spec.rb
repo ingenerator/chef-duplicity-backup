@@ -25,7 +25,7 @@ describe 'duplicity-backup::configure_backup' do
   let (:s3_european_buckets) { true }
 
   context "when required attributes are set" do
-    cached (:chef_run) do
+    let (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         custom_attributes = default_required_attributes
         # Set non-standard attributes to check the recipe is using the attributes
