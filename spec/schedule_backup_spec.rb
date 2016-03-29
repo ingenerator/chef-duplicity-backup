@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'duplicity-backup::schedule_backup' do
-  let (:chef_run) do
+  cached (:chef_run) do
     ChefSpec::SoloRunner.new do | node |
       # Set non-standard attributes to check the recipe is using the attributes
       node.set['duplicity']['cron_command'] = 'configurable_command'
@@ -43,7 +43,7 @@ describe 'duplicity-backup::schedule_backup' do
   end
   
   context "with some schedule attributes configured" do
-    let (:chef_run) do
+    cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
         node.set['duplicity']['schedule']['hour'] = 3
@@ -62,7 +62,7 @@ describe 'duplicity-backup::schedule_backup' do
   end
   
   context "with default options and one schedule attribute configured" do
-    let (:chef_run) do
+    cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
         node.set['duplicity']['schedule']['hour'] = 3
@@ -83,7 +83,7 @@ describe 'duplicity-backup::schedule_backup' do
   end
   
   context "if no schedule attributes are configured" do
-    let (:chef_run) do
+    cached (:chef_run) do
       ChefSpec::SoloRunner.new.converge(described_recipe)
     end    
     

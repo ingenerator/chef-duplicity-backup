@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'duplicity-backup::default' do
-  let (:chef_run) do
+  cached (:chef_run) do
     ChefSpec::SoloRunner.new do | node |
       # Define the required attributes that we'll fail without
       node.set['duplicity']['backup_passphrase']  = 'pass'

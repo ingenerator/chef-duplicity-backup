@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'duplicity-backup::backup_mysql_user' do
   context "when mysql backup is enabled" do
-    let (:chef_run) do
+    cached (:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '12.04') do | node |
         # Set non-standard attributes to check the recipe is using the attributes
         node.set['duplicity']['backup_mysql']     = true
@@ -43,7 +43,7 @@ describe 'duplicity-backup::backup_mysql_user' do
   end
 
   context "when mysql backup is disabled" do
-    let (:chef_run) do
+    cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
         node.set['duplicity']['backup_mysql']   = false
