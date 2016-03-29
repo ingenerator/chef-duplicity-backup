@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'duplicity-backup::default' do
   let (:chef_run) do
-    ChefSpec::Runner.new do | node |
+    ChefSpec::SoloRunner.new do | node |
       # Define the required attributes that we'll fail without
       node.set['duplicity']['backup_passphrase']  = 'pass'
       node.set['duplicity']['db_destination']     = 's3+http://bucket/dbpath'

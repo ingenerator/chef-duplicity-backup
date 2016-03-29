@@ -26,7 +26,7 @@ describe 'duplicity-backup::configure_backup' do
 
   context "when required attributes are set" do
     let (:chef_run) do
-      ChefSpec::Runner.new do | node |
+      ChefSpec::SoloRunner.new do | node |
         custom_attributes = default_required_attributes
         # Set non-standard attributes to check the recipe is using the attributes
         custom_attributes['globbing_file_patterns'] = {'/var/www/uploads' => true,'/var/something' => true}
@@ -241,7 +241,7 @@ describe 'duplicity-backup::configure_backup' do
   end
 
   def converge_without_attribute(attribute)
-    ChefSpec::Runner.new do | node |
+    ChefSpec::SoloRunner.new do | node |
       set_node_duplicity_attributes_without(node, default_required_attributes, attribute)
       node.set['duplicity']['backup_mysql'] = backup_mysql
     end.converge(described_recipe)

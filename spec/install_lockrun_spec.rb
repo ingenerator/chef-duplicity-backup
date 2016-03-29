@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'duplicity-backup::install_lockrun' do
   let (:chef_run) do
-    ChefSpec::Runner.new do | node |
+    ChefSpec::SoloRunner.new do | node |
       # Set non-standard attributes to check the recipe is using the attributes
       node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
     end.converge(described_recipe)

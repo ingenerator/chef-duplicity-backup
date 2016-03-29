@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'duplicity-backup::install_duplicity' do
   let (:chef_run) do
-    ChefSpec::Runner.new do | node |
+    ChefSpec::SoloRunner.new do | node |
       # Set non-standard attributes to check the recipe is using the attributes
       node.set['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.22/+download/duplicity-0.6.22.tar.gz'
       node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
