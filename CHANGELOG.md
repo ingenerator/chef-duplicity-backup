@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [DEV] Update to latest berkshelf, chefspec, foodcritic & ruby versions
 * [BUG] Add --events option to backup mysql.event and suppress warning
 
 ## 1.0.1 / 2016-02-19
