@@ -5,6 +5,8 @@ license 'Apache 2.0'
 description 'Installs and configures duplicity for remote backup'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version '1.0.1'
+issues_url 'https://github.com/ingenerator/chef-duplicity-backup/issues'
+source_url 'https://github.com/ingenerator/chef-duplicity-backup'
 
 %w(ubuntu).each do |os|
   supports os
