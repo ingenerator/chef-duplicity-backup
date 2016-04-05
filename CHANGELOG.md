@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 1.1.1 / 2016-04-05
+
 * [BUG] mysqldump user requires the `EVENT` privilege to backup events
 * [BUG] backup script should fail if mysqldump fails
 
