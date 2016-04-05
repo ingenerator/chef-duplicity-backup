@@ -30,8 +30,15 @@ do
   if [ "$db" != "information_schema" ]; then
     echo " * Dumping mySQL database $db"
     FOUND_DBS="$FOUND_DBS, $db"
+
+    if [ "$db" == "mysql" ]; then
+      SCHEMA_BACKUP_FLAGS="--events"
+    else
+      SCHEMA_BACKUP_FLAGS=""
+    fi
+
     mysqldump --defaults-file=/etc/duplicity/mysql.cnf \
-              --events \
+              $SCHEMA_BACKUP_FLAGS \
               -h localhost \
               <%=node['duplicity']['mysql']['innodb_only'] ? '--single-transaction' : '' %> \
               "$db" | gzip -9 > "$MYSQLTMPDIR/mysql-$db.sql.gz"

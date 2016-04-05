@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 1.1.2 / 2016-04-05
+
+* [BUG] mysql backup script is still failing due to issues with --events flag
+
 ## 1.1.1 / 2016-04-05
 
 * [BUG] mysqldump user requires the `EVENT` privilege to backup events
