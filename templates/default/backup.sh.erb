@@ -4,6 +4,8 @@
 # Setup error detection and handling
 set -o nounset
 set -o errexit
+set -o pipefail
+
 function error_handler()
 {
     echo "********************************************************"
