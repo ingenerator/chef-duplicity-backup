@@ -25,23 +25,23 @@ describe 'duplicity-backup::default' do
   end
   
   it "installs duplicity" do
-    chef_run.should include_recipe("duplicity-backup::install_duplicity")
+    expect(chef_run).to include_recipe("duplicity-backup::install_duplicity")
   end
   
   it "installs lockrun" do
-    chef_run.should include_recipe("duplicity-backup::install_lockrun")
+    expect(chef_run).to include_recipe("duplicity-backup::install_lockrun")
   end
   
   it "configures the backup scripts and credentials" do
-    chef_run.should include_recipe("duplicity-backup::configure_backup")
+    expect(chef_run).to include_recipe("duplicity-backup::configure_backup")
   end
   
   it "creates a mysql user for backup" do
-    chef_run.should include_recipe("duplicity-backup::backup_mysql_user")
+    expect(chef_run).to include_recipe("duplicity-backup::backup_mysql_user")
   end
   
   it "schedules the backup cron" do
-    chef_run.should include_recipe("duplicity-backup::schedule_backup")
+    expect(chef_run).to include_recipe("duplicity-backup::schedule_backup")
   end
 
 end

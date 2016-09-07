@@ -43,7 +43,7 @@ describe 'duplicity-backup::configure_backup' do
     end
 
     it "creates a duplicity config directory" do
-      chef_run.should create_directory("/etc/duplicity").with(
+      expect(chef_run).to create_directory("/etc/duplicity").with(
         :owner => "root",
         :group => "root",
         :mode  => 0755
@@ -53,11 +53,11 @@ describe 'duplicity-backup::configure_backup' do
     it "writes the file list template with globbing patterns on each line" do
       chef_run.node.normal['duplicity']['globbing_file_patterns'] = {'/var/www/uploads' => true,'/var/something' => true}
       chef_run.converge(described_recipe)
-      chef_run.should render_file('/etc/duplicity/globbing_file_list').with_content(/\/var\/www\/uploads\n\/var\/something/)
+      expect(chef_run).to render_file('/etc/duplicity/globbing_file_list').with_content(/\/var\/www\/uploads\n\/var\/something/)
     end
 
     it "writes the file list template with restricted permissions" do
-      chef_run.should create_template('/etc/duplicity/globbing_file_list').with(
+      expect(chef_run).to create_template('/etc/duplicity/globbing_file_list').with(
         :owner => "root",
         :group => "root",
         :mode => 0644
@@ -65,7 +65,7 @@ describe 'duplicity-backup::configure_backup' do
     end
 
     it "writes the backup script template with restricted permissions" do
-      chef_run.should create_template('/etc/duplicity/backup.sh').with(
+      expect(chef_run).to create_template('/etc/duplicity/backup.sh').with(
         :owner => "root",
         :group => "root",
         :mode  => 0744
@@ -77,18 +77,18 @@ describe 'duplicity-backup::configure_backup' do
         let (:backup_mysql) { true }
 
         it "performs a mysqldump before running the backup" do
-          chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/mysqldump/)
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/mysqldump/)
         end
 
         it "includes backing up the mysqldump as a separate backup job" do
-          chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/duplicity.+?"s3\+http:\/\/bucket\/dbpath"\n/m)
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/duplicity.+?"s3\+http:\/\/bucket\/dbpath"\n/m)
         end
 
         context "when mysql.innodb_only is set" do
           let (:innodb_only) { true }
 
           it "includes the --single-transaction mysqldump flag" do
-            chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/mysqldump.+?--single-transaction/m)
+            expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/mysqldump.+?--single-transaction/m)
           end
         end
 
@@ -96,7 +96,7 @@ describe 'duplicity-backup::configure_backup' do
           let (:innodb_only) { false }
 
           it "does not include the --single-transaction mysqldump flag" do
-            chef_run.should_not render_file('/etc/duplicity/backup.sh').with_content(/mysqldump.+?--single-transaction/m)
+            expect(chef_run).not_to render_file('/etc/duplicity/backup.sh').with_content(/mysqldump.+?--single-transaction/m)
           end
         end
 
@@ -104,7 +104,7 @@ describe 'duplicity-backup::configure_backup' do
 
       context "when backup_mysql is not set" do
         it "does not include any mysql commands" do
-          chef_run.should_not render_file('/etc/duplicity/backup.sh').with_content(/mysql/)
+          expect(chef_run).not_to render_file('/etc/duplicity/backup.sh').with_content(/mysql/)
         end
       end
 
@@ -112,17 +112,17 @@ describe 'duplicity-backup::configure_backup' do
         let (:backup_postgresql) { true }
 
         it "performs a pg_dumpall before running the backup" do
-          chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/pg\_dumpall/)
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/pg\_dumpall/)
         end
 
         it "includes backing up the pgdump_all as a separate backup job" do
-          chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/duplicity.+?"s3\+http:\/\/bucket\/pgdest"\n/m)
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/duplicity.+?"s3\+http:\/\/bucket\/pgdest"\n/m)
         end
       end
 
       context "when backup_postgresql is not set" do
         it "does not include pgdump_all command" do
-          chef_run.should_not render_file('/etc/duplicity/backup.sh').with_content(/pgdump\_all/)
+          expect(chef_run).not_to render_file('/etc/duplicity/backup.sh').with_content(/pgdump\_all/)
         end
       end
 
@@ -130,7 +130,7 @@ describe 'duplicity-backup::configure_backup' do
         let (:s3_european_buckets) { false }
 
         it "does not include the duplicity flag" do
-          chef_run.should_not render_file('/etc/duplicity/backup.sh').with_content(/--s3-european-buckets/)
+          expect(chef_run).not_to render_file('/etc/duplicity/backup.sh').with_content(/--s3-european-buckets/)
         end
       end
 
@@ -138,22 +138,22 @@ describe 'duplicity-backup::configure_backup' do
         let (:s3_european_buckets) { true }
 
         it "includes the duplicity flag" do
-          chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/--s3-european-buckets/m)
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/--s3-european-buckets/m)
         end
       end
 
       it "includes the configured full_if_older_than values" do
-        chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/--full-if-older-than 10D/m)
+        expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/--full-if-older-than 10D/m)
       end
 
       it "includes the configured keep_n_full values" do
-        chef_run.should render_file('/etc/duplicity/backup.sh').with_content(/remove-all-but-n-full 10/m)
+        expect(chef_run).to render_file('/etc/duplicity/backup.sh').with_content(/remove-all-but-n-full 10/m)
       end
     end
 
     context "when generating the environment file" do
       it "ensures the file is only readable by root" do
-        chef_run.should create_template('/etc/duplicity/environment.sh').with(
+        expect(chef_run).to create_template('/etc/duplicity/environment.sh').with(
           :owner => "root",
           :group => "root",
           :mode  => 0700
@@ -161,19 +161,19 @@ describe 'duplicity-backup::configure_backup' do
       end
 
       it "includes the backup passphrase" do
-        chef_run.should render_file('/etc/duplicity/environment.sh').with_content('PASSPHRASE="passphrase"')
+        expect(chef_run).to render_file('/etc/duplicity/environment.sh').with_content('PASSPHRASE="passphrase"')
       end
 
       it "includes any other configured env vars" do
         chef_run.node.normal['duplicity']['duplicity_environment']['AWS_KEY'] = 'ourkey'
-        chef_run.converge(described_recipe).should render_file('/etc/duplicity/environment.sh').with_content('AWS_KEY="ourkey"')
+        expect(chef_run.converge(described_recipe)).to render_file('/etc/duplicity/environment.sh').with_content('AWS_KEY="ourkey"')
       end
     end
 
     context "when generating the mysql credential file" do
 
       it "ensures the file is only readable by root" do
-        chef_run.should create_template('/etc/duplicity/mysql.cnf').with(
+        expect(chef_run).to create_template('/etc/duplicity/mysql.cnf').with(
           :owner => "root",
           :group => "root",
           :mode  => 0600
@@ -181,11 +181,11 @@ describe 'duplicity-backup::configure_backup' do
       end
 
       it "includes the backup username" do
-        chef_run.converge(described_recipe).should render_file('/etc/duplicity/mysql.cnf').with_content('user="backupuser"')
+        expect(chef_run.converge(described_recipe)).to render_file('/etc/duplicity/mysql.cnf').with_content('user="backupuser"')
       end
 
       it "includes the backup password" do
-        chef_run.converge(described_recipe).should render_file('/etc/duplicity/mysql.cnf').with_content('password="mysqlpass"')
+        expect(chef_run.converge(described_recipe)).to render_file('/etc/duplicity/mysql.cnf').with_content('password="mysqlpass"')
       end
     end
   end

@@ -13,15 +13,15 @@ describe 'duplicity-backup::backup_postgresql_user' do
     end
 
     it "should include the database::postgresql recipe" do
-      chef_run.should include_recipe('database::postgresql')
+      expect(chef_run).to include_recipe('database::postgresql')
     end
 
     it "should create a database user for backups" do
-      chef_run.should create_postgresql_database_user('backup')
+      expect(chef_run).to create_postgresql_database_user('backup')
     end
 
     it "should use the postgres account and postgres password attribute for the connection" do
-      chef_run.should create_postgresql_database_user('backup').with(
+      expect(chef_run).to create_postgresql_database_user('backup').with(
         :connection => { :host => 'localhost', :port => 5432, :username => 'postgres', :password => 'postgrespass' }
       )
     end
@@ -38,11 +38,11 @@ describe 'duplicity-backup::backup_postgresql_user' do
     end
 
     it "should not include the database::postgresql recipe" do
-      chef_run.should_not include_recipe('database::postgresql')
+      expect(chef_run).not_to include_recipe('database::postgresql')
     end
 
     it "should not create a database user" do
-      chef_run.should_not create_postgresql_database_user('backup')
+      expect(chef_run).not_to create_postgresql_database_user('backup')
     end
 
   end

@@ -17,23 +17,23 @@ describe 'duplicity-backup::schedule_backup' do
   end    
 
   it "creates a cron for the backup job" do
-    chef_run.should create_cron("duplicity_backup")
+    expect(chef_run).to create_cron("duplicity_backup")
   end
   
   it "uses the configurable command for the cron task to execute" do
-    chef_run.should create_cron("duplicity_backup").with({
+    expect(chef_run).to create_cron("duplicity_backup").with({
       :command => 'configurable_command'
     })
   end
   
   it "sets the configured mailto address for the cron task" do
-    chef_run.should create_cron("duplicity_backup").with({
+    expect(chef_run).to create_cron("duplicity_backup").with({
       :mailto => 'someone@local'
     })
   end
   
   it "sets the configured schedule for the cron task" do
-    chef_run.should create_cron("duplicity_backup").with({
+    expect(chef_run).to create_cron("duplicity_backup").with({
       :minute  => '1',
       :hour    => '2',
       :day     => '3',
@@ -51,7 +51,7 @@ describe 'duplicity-backup::schedule_backup' do
     end    
 
     it "sets other options to *" do
-      chef_run.should create_cron("duplicity_backup").with({
+      expect(chef_run).to create_cron("duplicity_backup").with({
         :minute  => '*',
         :hour    => '3',
         :day     => '*',
@@ -70,13 +70,13 @@ describe 'duplicity-backup::schedule_backup' do
     end    
     
     it "runs duplicity inside lockrun to prevent collisions" do
-      chef_run.should create_cron("duplicity_backup").with({
+      expect(chef_run).to create_cron("duplicity_backup").with({
         :command => '/usr/local/bin/lockrun --lockfile=/var/run/duplicity_backup.lockrun -- /etc/duplicity/backup.sh'
       })
     end
         
     it "does not set a mailto address" do
-      chef_run.should create_cron("duplicity_backup").with({
+      expect(chef_run).to create_cron("duplicity_backup").with({
         :mailto => nil
       })    
     end
