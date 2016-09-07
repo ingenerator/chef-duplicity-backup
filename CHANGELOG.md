@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 2.0.0 / 2016-09-07
+
 * [BREAKING] Update to latest version of the database cookbook - note you
   *must* now install the mysql2_chef_gem yourself before use - this is no
   longer handled by this cookbook to minimise hard dependencies. See the 
