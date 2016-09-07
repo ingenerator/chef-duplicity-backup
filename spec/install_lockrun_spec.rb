@@ -4,7 +4,7 @@ describe 'duplicity-backup::install_lockrun' do
   cached (:chef_run) do
     ChefSpec::SoloRunner.new do | node |
       # Set non-standard attributes to check the recipe is using the attributes
-      node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
+      node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
     end.converge(described_recipe)
   end    
 
@@ -47,7 +47,7 @@ describe 'duplicity-backup::install_lockrun' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
+        node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
       end.converge(described_recipe)
     end 
 

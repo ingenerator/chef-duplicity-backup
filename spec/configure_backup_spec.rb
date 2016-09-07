@@ -51,7 +51,7 @@ describe 'duplicity-backup::configure_backup' do
     end
 
     it "writes the file list template with globbing patterns on each line" do
-      chef_run.node.set['duplicity']['globbing_file_patterns'] = {'/var/www/uploads' => true,'/var/something' => true}
+      chef_run.node.normal['duplicity']['globbing_file_patterns'] = {'/var/www/uploads' => true,'/var/something' => true}
       chef_run.converge(described_recipe)
       chef_run.should render_file('/etc/duplicity/globbing_file_list').with_content(/\/var\/www\/uploads\n\/var\/something/)
     end
@@ -165,7 +165,7 @@ describe 'duplicity-backup::configure_backup' do
       end
 
       it "includes any other configured env vars" do
-        chef_run.node.set['duplicity']['duplicity_environment']['AWS_KEY'] = 'ourkey'
+        chef_run.node.normal['duplicity']['duplicity_environment']['AWS_KEY'] = 'ourkey'
         chef_run.converge(described_recipe).should render_file('/etc/duplicity/environment.sh').with_content('AWS_KEY="ourkey"')
       end
     end
@@ -243,7 +243,7 @@ describe 'duplicity-backup::configure_backup' do
   def converge_without_attribute(attribute)
     ChefSpec::SoloRunner.new do | node |
       set_node_duplicity_attributes_without(node, default_required_attributes, attribute)
-      node.set['duplicity']['backup_mysql'] = backup_mysql
+      node.normal['duplicity']['backup_mysql'] = backup_mysql
     end.converge(described_recipe)
   end
 
@@ -257,7 +257,7 @@ describe 'duplicity-backup::configure_backup' do
 
   def set_node_duplicity_attributes(node, attr_hash)
     attr_hash.each do | attribute, value |
-      node.set['duplicity'][attribute] = value
+      node.normal['duplicity'][attribute] = value
     end
   end
 

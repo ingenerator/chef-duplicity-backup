@@ -5,10 +5,10 @@ describe 'duplicity-backup::backup_postgresql_user' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '12.04') do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['backup_postgresql']     = true
-        node.set['duplicity']['postgresql']['user']       = 'backup'
-        node.set['duplicity']['postgresql']['password']   = 'backuppass'
-        node.set['postgresql']['password']['postgres']    = 'postgrespass'
+        node.normal['duplicity']['backup_postgresql']     = true
+        node.normal['duplicity']['postgresql']['user']       = 'backup'
+        node.normal['duplicity']['postgresql']['password']   = 'backuppass'
+        node.normal['postgresql']['password']['postgres']    = 'postgrespass'
       end.converge(described_recipe)
     end
 
@@ -32,8 +32,8 @@ describe 'duplicity-backup::backup_postgresql_user' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['backup_postgresql']   = false
-        node.set['duplicity']['postgresql']['user']  = 'backup'
+        node.normal['duplicity']['backup_postgresql']   = false
+        node.normal['duplicity']['postgresql']['user']  = 'backup'
       end.converge(described_recipe)
     end
 

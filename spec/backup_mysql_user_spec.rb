@@ -5,10 +5,10 @@ describe 'duplicity-backup::backup_mysql_user' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '12.04') do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['backup_mysql']     = true
-        node.set['duplicity']['mysql']['user']       = 'backup'
-        node.set['duplicity']['mysql']['password']   = 'backuppwd'
-        node.set['mysql']['server_root_password'] = 'mysql'
+        node.normal['duplicity']['backup_mysql']     = true
+        node.normal['duplicity']['mysql']['user']       = 'backup'
+        node.normal['duplicity']['mysql']['password']   = 'backuppwd'
+        node.normal['mysql']['server_root_password'] = 'mysql'
       end.converge(described_recipe)
     end
     
@@ -46,8 +46,8 @@ describe 'duplicity-backup::backup_mysql_user' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['backup_mysql']   = false
-        node.set['duplicity']['mysql']['user']  = 'backup'
+        node.normal['duplicity']['backup_mysql']   = false
+        node.normal['duplicity']['mysql']['user']  = 'backup'
       end.converge(described_recipe)
     end
     

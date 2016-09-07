@@ -4,9 +4,9 @@ describe 'duplicity-backup::schedule_backup' do
   cached (:chef_run) do
     ChefSpec::SoloRunner.new do | node |
       # Set non-standard attributes to check the recipe is using the attributes
-      node.set['duplicity']['cron_command'] = 'configurable_command'
-      node.set['duplicity']['mailto']       = 'someone@local'
-      node.set['duplicity']['schedule']     = {
+      node.normal['duplicity']['cron_command'] = 'configurable_command'
+      node.normal['duplicity']['mailto']       = 'someone@local'
+      node.normal['duplicity']['schedule']     = {
         'minute'  => 1,
         'hour'    => 2,
         'day'     => 3,
@@ -46,7 +46,7 @@ describe 'duplicity-backup::schedule_backup' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['schedule']['hour'] = 3
+        node.normal['duplicity']['schedule']['hour'] = 3
       end.converge(described_recipe)
     end    
 
@@ -65,7 +65,7 @@ describe 'duplicity-backup::schedule_backup' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['schedule']['hour'] = 3
+        node.normal['duplicity']['schedule']['hour'] = 3
       end.converge(described_recipe)
     end    
     
