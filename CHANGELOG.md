@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [DEV] Update chefspec/chef dependencies and specs to resolve deprecation
+  warnings
+
 ## 1.1.2 / 2016-04-05
 
 * [BUG] mysql backup script is still failing due to issues with --events flag

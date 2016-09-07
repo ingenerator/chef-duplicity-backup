@@ -4,7 +4,7 @@ describe 'duplicity-backup::install_lockrun' do
   cached (:chef_run) do
     ChefSpec::SoloRunner.new do | node |
       # Set non-standard attributes to check the recipe is using the attributes
-      node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
+      node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
     end.converge(described_recipe)
   end    
 
@@ -13,7 +13,7 @@ describe 'duplicity-backup::install_lockrun' do
   end
 
   it "creates a lockrun directory in the configured source dir" do
-    chef_run.should create_directory("/usr/local/othersrc/lockrun").with(
+    expect(chef_run).to create_directory("/usr/local/othersrc/lockrun").with(
       :owner     => "root",
       :group     => "root",
       :mode      => 0755,
@@ -22,7 +22,7 @@ describe 'duplicity-backup::install_lockrun' do
   end
   
   it "copies the lockrun.c source file to the source dir" do
-    chef_run.should create_cookbook_file("/usr/local/othersrc/lockrun/lockrun.c").with(
+    expect(chef_run).to create_cookbook_file("/usr/local/othersrc/lockrun/lockrun.c").with(
       :owner  => "root",
       :group  => "root", 
       :mode    => 0644
@@ -35,7 +35,7 @@ describe 'duplicity-backup::install_lockrun' do
     end
 
     it "does not compile" do
-      chef_run.should_not run_execute("gcc lockrun.c -o lockrun")
+      expect(chef_run).not_to run_execute("gcc lockrun.c -o lockrun")
     end
   end
   
@@ -47,12 +47,12 @@ describe 'duplicity-backup::install_lockrun' do
     cached (:chef_run) do
       ChefSpec::SoloRunner.new do | node |
         # Set non-standard attributes to check the recipe is using the attributes
-        node.set['duplicity']['src_dir'] = '/usr/local/othersrc'
+        node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
       end.converge(described_recipe)
     end 
 
     it "compiles lockrun from source" do
-      chef_run.should run_execute("gcc lockrun.c -o lockrun").with(
+      expect(chef_run).to run_execute("gcc lockrun.c -o lockrun").with(
         :cwd  => "/usr/local/othersrc/lockrun",
         :user => "root"        
       )
@@ -60,7 +60,7 @@ describe 'duplicity-backup::install_lockrun' do
   end
   
   it "links the executable from /usr/local/bin" do
-    chef_run.should create_link("/usr/local/bin/lockrun").with(
+    expect(chef_run).to create_link("/usr/local/bin/lockrun").with(
       :to => "/usr/local/othersrc/lockrun/lockrun"
     )
   end
