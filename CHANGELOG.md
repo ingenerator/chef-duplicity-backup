@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 1.1.3 / 2016-09-07
+
 * [DEV] Update chefspec/chef dependencies and specs to resolve deprecation
   warnings
 
