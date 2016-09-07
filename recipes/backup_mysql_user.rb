@@ -21,10 +21,8 @@
 #
 
 if node['duplicity']['backup_mysql'] then
-  
-  include_recipe('database::mysql')
-  
-  root_connection = { 
+
+  root_connection = {
     :host     => 'localhost', 
     :username => 'root', 
     :password => node['mysql']['server_root_password'] 

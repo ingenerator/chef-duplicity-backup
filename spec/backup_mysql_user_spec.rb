@@ -11,11 +11,7 @@ describe 'duplicity-backup::backup_mysql_user' do
         node.normal['mysql']['server_root_password'] = 'mysql'
       end.converge(described_recipe)
     end
-    
-    it "should include the database::mysql recipe" do
-      expect(chef_run).to include_recipe('database::mysql')
-    end
-    
+
     it "should create a database user for backups" do
       expect(chef_run).to grant_mysql_database_user('backup')
     end
