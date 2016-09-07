@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [BREAKING] Update to latest version of the database cookbook - note you
+  *must* now install the mysql2_chef_gem yourself before use - this is no
+  longer handled by this cookbook to minimise hard dependencies. See the 
+  README.
+
 ## 1.1.3 / 2016-09-07
 
 * [DEV] Update chefspec/chef dependencies and specs to resolve deprecation
