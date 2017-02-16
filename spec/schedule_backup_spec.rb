@@ -2,96 +2,75 @@ require 'spec_helper'
 
 describe 'duplicity-backup::schedule_backup' do
   cached (:chef_run) do
-    ChefSpec::SoloRunner.new do | node |
+    ChefSpec::SoloRunner.new do |node|
       # Set non-standard attributes to check the recipe is using the attributes
-      node.normal['duplicity']['cron_command'] = 'configurable_command'
-      node.normal['duplicity']['mailto']       = 'someone@local'
-      node.normal['duplicity']['schedule']     = {
+      node.normal['duplicity']['schedule'] = {
         'minute'  => 1,
         'hour'    => 2,
         'day'     => 3,
         'weekday' => 4,
         'month'   => 5
       }
+      node.normal['duplicity']['success_notify_url'] = 'http://foo.bar/:runtime:'
     end.converge(described_recipe)
-  end    
+  end
 
-  it "creates a cron for the backup job" do
-    expect(chef_run).to create_cron("duplicity_backup")
+  it 'deletes any legacy `duplicity_backup` raw cron' do
+    expect(chef_run).to delete_cron('duplicity_backup')
   end
-  
-  it "uses the configurable command for the cron task to execute" do
-    expect(chef_run).to create_cron("duplicity_backup").with({
-      :command => 'configurable_command'
-    })
+
+  it 'creates a monitored_cron for the backup job' do
+    expect(chef_run).to create_monitored_cron('duplicity-backup').with(
+      command: '/etc/duplicity/backup.sh'
+    )
   end
-  
-  it "sets the configured mailto address for the cron task" do
-    expect(chef_run).to create_cron("duplicity_backup").with({
-      :mailto => 'someone@local'
-    })
+
+  it 'specifies that the backup job requires a lock' do
+    expect(chef_run).to create_monitored_cron('duplicity-backup').with(
+      require_lock: true
+    )
   end
-  
-  it "sets the configured schedule for the cron task" do
-    expect(chef_run).to create_cron("duplicity_backup").with({
-      :minute  => '1',
-      :hour    => '2',
-      :day     => '3',
-      :weekday => '4',
-      :month   => '5'
-    })
+
+  it 'sets the configured schedule for the backup' do
+    expect(chef_run).to create_monitored_cron('duplicity-backup').with(
+      schedule: {
+        'minute'  => 1,
+        'hour'    => 2,
+        'day'     => 3,
+        'weekday' => 4,
+        'month'   => 5
+      }
+    )
   end
-  
-  context "with some schedule attributes configured" do
+
+  it 'configures an optional notify url' do
+    expect(chef_run).to create_monitored_cron('duplicity-backup').with(
+      notify_url: 'http://foo.bar/:runtime:'
+    )
+  end
+
+  context 'with some schedule attributes configured' do
     cached (:chef_run) do
-      ChefSpec::SoloRunner.new do | node |
+      ChefSpec::SoloRunner.new do |node|
         # Set non-standard attributes to check the recipe is using the attributes
         node.normal['duplicity']['schedule']['hour'] = 3
       end.converge(described_recipe)
-    end    
+    end
 
-    it "sets other options to *" do
-      expect(chef_run).to create_cron("duplicity_backup").with({
-        :minute  => '*',
-        :hour    => '3',
-        :day     => '*',
-        :weekday => '*',
-        :month   => '*'
-      })
+    it 'configures only the specified schedule values *' do
+      expect(chef_run).to create_monitored_cron('duplicity-backup').with(schedule: { 'hour' => 3 })
     end
   end
-  
-  context "with default options and one schedule attribute configured" do
+
+  context 'with default options and at least one schedule option' do
     cached (:chef_run) do
-      ChefSpec::SoloRunner.new do | node |
+      ChefSpec::SoloRunner.new do |node|
         # Set non-standard attributes to check the recipe is using the attributes
         node.normal['duplicity']['schedule']['hour'] = 3
       end.converge(described_recipe)
-    end    
-    
-    it "runs duplicity inside lockrun to prevent collisions" do
-      expect(chef_run).to create_cron("duplicity_backup").with({
-        :command => '/usr/local/bin/lockrun --lockfile=/var/run/duplicity_backup.lockrun -- /etc/duplicity/backup.sh'
-      })
     end
-        
-    it "does not set a mailto address" do
-      expect(chef_run).to create_cron("duplicity_backup").with({
-        :mailto => nil
-      })    
+    it 'does not set a notify_url' do
+      expect(chef_run).to create_monitored_cron('duplicity-backup').with(notify_url: nil)
     end
-  end
-  
-  context "if no schedule attributes are configured" do
-    cached (:chef_run) do
-      ChefSpec::SoloRunner.new.converge(described_recipe)
-    end    
-    
-    it "fails rather than schedule for every minute" do
-      expect {
-        chef_run
-      }.to raise_error(ArgumentError)
-    end
-  
   end
 end

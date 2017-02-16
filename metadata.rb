@@ -14,4 +14,5 @@ end
 
 depends 'python'
 depends 'database', '~> 5.1'
+depends 'monitored-cron', '~> 0.1'
 depends 'postgresql'

@@ -21,17 +21,16 @@
 #
 
 defined_schedule = node['duplicity']['schedule'].select { | period, value | ! value.nil? }
-if defined_schedule.empty? then
-  raise ArgumentError, "You must define at least one schedule attribute for the backup job, or it would run every minute!"
+
+monitored_cron 'duplicity-backup' do
+  action       :create
+  command      '/etc/duplicity/backup.sh'
+  schedule     defined_schedule
+  require_lock true
+  notify_url   node['duplicity']['success_notify_url'] if node['duplicity']['success_notify_url']
 end
 
+# If there still a legacy (<2.x) cron job provisioned, get rid of it
 cron "duplicity_backup" do
-  action  :create
-  command node['duplicity']['cron_command']
-  mailto  node['duplicity']['mailto']
-  minute  node['duplicity']['schedule']['minute']
-  hour    node['duplicity']['schedule']['hour']  
-  day     node['duplicity']['schedule']['day']   
-  weekday node['duplicity']['schedule']['weekday'] 
-  month   node['duplicity']['schedule']['month']   
+  action  :delete
 end

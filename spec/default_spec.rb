@@ -18,28 +18,24 @@ describe 'duplicity-backup::default' do
         'month'   => 5
       }
     end.converge(described_recipe)
-  end    
-  
+  end
+
   before(:each) do
     stub_command('which lockrun').and_return('')
   end
-  
+
   it "installs duplicity" do
     expect(chef_run).to include_recipe("duplicity-backup::install_duplicity")
   end
-  
-  it "installs lockrun" do
-    expect(chef_run).to include_recipe("duplicity-backup::install_lockrun")
-  end
-  
+    
   it "configures the backup scripts and credentials" do
     expect(chef_run).to include_recipe("duplicity-backup::configure_backup")
   end
-  
+
   it "creates a mysql user for backup" do
     expect(chef_run).to include_recipe("duplicity-backup::backup_mysql_user")
   end
-  
+
   it "schedules the backup cron" do
     expect(chef_run).to include_recipe("duplicity-backup::schedule_backup")
   end

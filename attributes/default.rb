@@ -63,12 +63,6 @@ default['duplicity']['keep_n_full']        = nil
 # Use S3 european buckets
 default['duplicity']['s3-european-buckets'] = true
 
-# The cron command - customise to make this run something else, or to prepend environment vars/loggers/etc
-default['duplicity']['cron_command'] = '/usr/local/bin/lockrun --lockfile=/var/run/duplicity_backup.lockrun -- /etc/duplicity/backup.sh'
-
-# Customise the mail recipient - otherwise will be system default
-default['duplicity']['mailto'] = nil
-
 # Set the schedule - missing values will be set to '*'
 default['duplicity']['schedule']['minute']  = nil
 default['duplicity']['schedule']['hour']    = nil
@@ -76,4 +70,7 @@ default['duplicity']['schedule']['day']     = nil
 default['duplicity']['schedule']['weekday'] = nil
 default['duplicity']['schedule']['month']   = nil
 
-
+# A URL to ping (get) with a notification when the backup completes
+# Optionally include :runtime: anywhere in it to have it replaced with the backup
+# runtime in seconds
+default['duplicity']['success_notify_url'] = nil

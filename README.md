@@ -26,10 +26,10 @@ Have your main project cookbook *depend* on duplicity-backup by editing the `met
 depends 'duplicity-backup'
 ```
 
-If you want to backup a mysql database, you will also need to install the `mysql2` gem - 
+If you want to backup a mysql database, you will also need to install the `mysql2` gem -
 to allow the cookbook to manage users - this is not handled by the cookbook.
 
-You can do this by depending on the `mysql2_chef_gem` cookbook and adding the following 
+You can do this by depending on the `mysql2_chef_gem` cookbook and adding the following
 resource definition to a recipe of your own:
 
 ```ruby
@@ -58,7 +58,6 @@ The default recipe executes the following steps:
 | Recipe                  | Action                                                                                              |
 |-------------------------|-----------------------------------------------------------------------------------------------------|
 | install_duplicity       | Installs duplicity itself                                                                           |
-| install_lockrun         | Installs and builds lockrun                                                                         |
 | configure_backup        | Deploys the backup script and file list                                                             |
 | backup_mysql_user       | Creates a read-only database user for running backups, if database backup is configured             |
 | backup_postgresql_user  | Creates a PostgreSQL database user for running backups, if database backup is configured            |
@@ -66,6 +65,8 @@ The default recipe executes the following steps:
 
 **Note that including the backup_mysql_user recipe causes chef to include the mysql client recipe, which will run before
   all other recipes in your cookbook.**
+
+Output and any errors will be logged to syslog.
 
 To customise behaviour, include any or all of these recipes directly rather than relying on the default.
 

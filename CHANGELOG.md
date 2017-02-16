@@ -4,11 +4,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [BREAKING] Replaces the standard `cron` resource with `monitored_cron`, and:
+  * **deletes** any old `duplicity_backup` cron entry
+  * **deletes** the previous `duplicity-backup::install_lockrun` recipe and
+    related attributes
+  * **removes** the duplicity `cron_command` attribute
+  * **removes** the duplicity `mailto` attribute
+  * installs a new `monitored-duplicity-backup` cron using the wrapper script
+  * adds new optional attributes to configure a notification URL
+
 ## 2.0.0 / 2016-09-07
 
 * [BREAKING] Update to latest version of the database cookbook - note you
   *must* now install the mysql2_chef_gem yourself before use - this is no
-  longer handled by this cookbook to minimise hard dependencies. See the 
+  longer handled by this cookbook to minimise hard dependencies. See the
   README.
 
 ## 1.1.3 / 2016-09-07
