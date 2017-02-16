@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [BREAKING] Disables use of a trailing / on globbing file patterns : this
+  syntax causes duplicity to back up empty tree structures with no files. Since
+  this is potentially very dangerous, I've disabled it.
 * [BREAKING] Replaces the standard `cron` resource with `monitored_cron`, and:
   * **deletes** any old `duplicity_backup` cron entry
   * **deletes** the previous `duplicity-backup::install_lockrun` recipe and

@@ -42,6 +42,15 @@ required_attributes.each do | key |
   raise ArgumentError, "You must set node['duplicity']['#{key}']" unless node['duplicity'][key]
 end
 
+node['duplicity']['globbing_file_patterns'].each do | pattern, is_active |
+  if is_active && (pattern[-1] == '/')
+    raise(
+      ArgumentError,
+      'You must not use a trailing slash on globbing patterns : this would tell duplicity to back up an empty tree with no files'
+    )
+  end
+end
+
 directory "/etc/duplicity" do
   action :create
   mode   0755

@@ -240,6 +240,22 @@ describe 'duplicity-backup::configure_backup' do
 
   end
 
+  context 'when globbing file patterns use a trailing /' do
+    let (:chef_run) do
+      ChefSpec::SoloRunner.new do | node |
+        set_node_duplicity_attributes(node, default_required_attributes)
+        node.normal['duplicity']['globbing_file_patterns'] = {'/var/www/uploads' => true,'/var/something/' => true}
+      end.converge(described_recipe)
+    end
+
+    # Refs https://bugs.launchpad.net/duplicity/+bug/1586032 and
+    # https://bugs.launchpad.net/duplicity/+bug/1479545
+    # This behaviour is confusing so disable it
+    it 'throws an exception' do
+      expect { chef_run }.to raise_error(ArgumentError, /trailing slash/)
+    end
+  end
+
   def converge_without_attribute(attribute)
     ChefSpec::SoloRunner.new do | node |
       set_node_duplicity_attributes_without(node, default_required_attributes, attribute)
