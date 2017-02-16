@@ -22,6 +22,8 @@
 
 defined_schedule = node['duplicity']['schedule'].select { | period, value | ! value.nil? }
 
+include_recipe 'monitored-cron::default'
+
 monitored_cron 'duplicity-backup' do
   action       :create
   command      '/etc/duplicity/backup.sh'

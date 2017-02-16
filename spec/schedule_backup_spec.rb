@@ -15,8 +15,17 @@ describe 'duplicity-backup::schedule_backup' do
     end.converge(described_recipe)
   end
 
+  before(:each) do
+    #todo - fix the lockrun recipe so we don't need to stub this
+    stub_command("which lockrun").and_return('/bin/lockrun')
+  end
+
   it 'deletes any legacy `duplicity_backup` raw cron' do
     expect(chef_run).to delete_cron('duplicity_backup')
+  end
+
+  it 'includes the monitored-cron::default recipe' do
+    expect(chef_run).to include_recipe 'monitored-cron::default'
   end
 
   it 'creates a monitored_cron for the backup job' do
