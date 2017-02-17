@@ -8,13 +8,16 @@ describe 'duplicity-backup::install_duplicity' do
       node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
     end.converge(described_recipe)
   end
-  
-  it "installs pip" do
-    expect(chef_run).to include_recipe "python::pip"
+
+  it "installs python 2 with pip" do
+    expect(chef_run).to install_python_runtime('2.7').with(
+      pip_version: true,
+      setuptools_version: true
+    )
   end
-  
+
   it "installs the pip lockfile package" do
-    expect(chef_run).to install_python_pip "lockfile"
+    expect(chef_run).to install_python_package 'lockfile'
   end
 
   it "installs ncftp" do

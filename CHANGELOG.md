@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+
+* [BREAKING] Switch from deprecated `python` cookbook to `poise-python` for
+  installing duplicity's python dependencies.
 * Support database cookbook 6.x series - the breaking change at 6.0 doesn't
   affect this cookbook.
 * [BREAKING] Disables use of a trailing / on globbing file patterns : this

@@ -21,8 +21,8 @@
 #
 
 # Install the dependencies for build and for all the various backends
-include_recipe "python::pip"
-python_pip "lockfile"
+python_runtime '2.7'
+python_package 'lockfile'
 package "ncftp"
 package "python-paramiko"
 package "python-pycryptopp"
