@@ -13,6 +13,8 @@ source_url 'https://github.com/ingenerator/chef-duplicity-backup'
 end
 
 depends 'python'
-depends 'database', '~> 5.1'
+# Note: this should currently be >= 5.1, < 7.0 but it seems there's no way to
+# express that at the moment per https://github.com/berkshelf/semverse/issues/10
+depends 'database', '> 5.1'
 depends 'monitored-cron', '~> 0.1'
 depends 'postgresql'
