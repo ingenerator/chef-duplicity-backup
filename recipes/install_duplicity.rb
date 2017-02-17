@@ -53,5 +53,5 @@ execute "install-duplicity" do
   command  "tar xf #{src_name} && cd #{unpack_dir_name} && python setup.py install"
   user     "root"
   group    "root"
-  cwd      node['duplicity']['src_dir']  
+  cwd      node['duplicity']['src_dir']
 end
