@@ -1,0 +1,16 @@
+# Don't include version control, specs or build-time dependencies in the cookbook
+# Note that per https://github.com/berkshelf/berkshelf/issues/1492 berkshelf does
+# not treat directory-patterns with /* in the same way as chef itself, so we need
+# to specify an explicit directory name for each of the directories we want to
+# exclude. Otherwise per https://github.com/chefspec/chefspec/issues/870 the
+# chefspec run is painfully slow due to all the extra cookbook content.
+.git
+.git/*
+gemfiles
+gemfiles/*
+spec
+spec/*
+test
+test/*
+vendor
+vendor/*

@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* Ignore build-time files from the vendored cookbook
+* Update build dependencies and build against Chef 12 and Chef 13 (drops support for < 12.18.31)
+
 # 3.0.0 / 2017-02-17
 
 * [BREAKING] Switch from deprecated `python` cookbook to `poise-python` for

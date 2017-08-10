@@ -1,8 +1,17 @@
-sudo: false
+dist: trusty
 language: ruby
-cache: bundler
+cache:    bundler
 rvm:
-  - 2.3.1
+  - 2.3
+sudo:     false
+gemfile:
+  - Gemfile
+  - gemfiles/chef-12/Gemfile
 script:
   - bundle exec foodcritic -f any . -X spec
   - bundle exec rspec --color --format documentation
+branches:
+  only:
+    # Only build mainline branches - anything else will be picked up by the PR builder
+    # Prvents Travis building PR branches twice
+    - /^[0-9\.]+\.x$/
