@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* Update to duplicity 0.7.13.1
 * Update to poise-python 1.6 for Chef 13 support
 * Ignore build-time files from the vendored cookbook
 * Update build dependencies and build against Chef 12 and Chef 13 (drops support for < 12.18.31)
