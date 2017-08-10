@@ -1,6 +1,6 @@
 inGenerator Backup cookbook
 =================================
-[![Build Status](https://travis-ci.org/ingenerator/chef-duplicity-backup.png?branch=master)](https://travis-ci.org/ingenerator/chef-duplicity-backup)
+[![Build Status](https://travis-ci.org/ingenerator/chef-duplicity-backup.png?branch=4.0.x)](https://travis-ci.org/ingenerator/chef-duplicity-backup)
 
 `duplicity-backup` installs and configures [duplicity](http://duplicity.nongnu.org/) to handle remote backup of files
 and/or databases on a server. It also installs [lockrun](http://www.unixwiz.net/tools/lockrun.html) and
