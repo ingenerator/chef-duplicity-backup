@@ -1,3 +1,5 @@
-source "https://supermarket.chef.io"
+source 'https://supermarket.chef.io'
+source 'https://chef-supermarket.ingenerator.com'
+
 metadata
-cookbook 'monitored-cron', github: 'ingenerator/chef-monitored-cron', branch: '0.x'
+
