@@ -37,11 +37,7 @@ do
       SCHEMA_BACKUP_FLAGS=""
     fi
 
-    mysqldump --defaults-file=/etc/duplicity/mysql.cnf \
-              $SCHEMA_BACKUP_FLAGS \
-              -h localhost \
-              <%=node['duplicity']['mysql']['innodb_only'] ? '--single-transaction' : '' %> \
-              "$db" | gzip -9 > "$MYSQLTMPDIR/mysql-$db.sql.gz"
+    <%=@commands.mysqldump('$db', '$MYSQLTMPDIR/mysql-$db.sql.gz') %>
   fi
 done
 if [ -z "$FOUND_DBS" ]; then
@@ -51,74 +47,42 @@ if [ -z "$FOUND_DBS" ]; then
 fi
 
 echo "Backing up mysql database dump"
-/usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
-          --s3-use-new-style \
-          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
-          --name mysql_backup \
-          --allow-source-mismatch \
-          "$MYSQLTMPDIR" \
-          "<%=node['duplicity']['db_destination'] %>"
+<%=@commands.duplicity_backup_dir('$MYSQLTMPDIR', 'mysql_backup') %>
 
 rm -rf "$MYSQLTMPDIR"
 
 echo "Cleaning old mysql full database backups"
-/usr/local/bin/duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
-          --force \
-          --s3-use-new-style \
-          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
-          "<%=node['duplicity']['db_destination'] %>"
+<%=@commands.duplicity_remove_all_but_n_full('mysql_backup') %>
 
 <% end %>
 
+<% if node['duplicity']['backup_postgresql'] %>
 ### PostgreSQL backup ###
 
-<% if node['duplicity']['backup_postgresql'] %>
 echo "Creating postgresql database dump"
 
 # Create temp dir that only we can see
 POSTGRESTMPDIR="$(mktemp -d)"
 
-PGPASSFILE="/etc/duplicity/.pgpass" pg_dumpall -h<%=node['duplicity']['postgresql']['host'] %> -U<%=node['duplicity']['postgresql']['user'] %> | gzip -9 > "$POSTGRESTMPDIR/pgdump.sql.gz"
+<%=@commands.pg_dumpall('$POSTGRESTMPDIR/pgdump.sql.gz') %>
 
 echo "Backing up postgresql database dump"
-/usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
-          --s3-use-new-style \
-          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
-          --name pg_backup \
-          --allow-source-mismatch \
-          "$POSTGRESTMPDIR" \
-          "<%=node['duplicity']['pg_destination'] %>"
+<%=@commands.duplicity_backup_dir('$POSTGRESTMPDIR', 'pg_backup') %>
 
 rm -rf "$POSTGRESTMPDIR"
 
 echo "Cleaning old postgresql full database backups"
-/usr/local/bin/duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
-          --force \
-          --s3-use-new-style \
-          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
-          "<%=node['duplicity']['pg_destination'] %>"
+<%=@commands.duplicity_remove_all_but_n_full('pg_backup') %>
 
 <% end %>
 
 ### File backup ###
 echo "Backing up files"
-/usr/local/bin/duplicity --full-if-older-than <%=node['duplicity']['full_if_older_than'] %> \
-          --s3-use-new-style \
-          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
-          --name file_backup \
-          --include-filelist /etc/duplicity/globbing_file_list \
-          --exclude '**' \
-          / \
-          "<%=node['duplicity']['file_destination'] %>"
-
+<%=@commands.duplicity_backup_filelist %>
 
 ### Old backup cleanup ###
 echo "Cleaning old full backups"
-/usr/local/bin/duplicity remove-all-but-n-full <%=node['duplicity']['keep_n_full'] %> \
-          --force \
-          --s3-use-new-style \
-          <%=node['duplicity']['s3-european-buckets'] ? '--s3-european-buckets' : '' %> \
-          "<%=node['duplicity']['file_destination'] %>"
+<%=@commands.duplicity_remove_all_but_n_full('file_backup') %>
 
 echo ":):):):):):):):):):):):):):):):):):):):):):):)"
 echo "Backup Successful"

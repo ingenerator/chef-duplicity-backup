@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* Extracted backup command generation from the template to a custom helper, 
+  and refactored specs for the configure_backup recipe to stub the helper
+  and reflect the new responsibilities. This allows for clearer and more
+  rigorous specification of individual commands rather than having all the
+  logic in the template rendering
 * Some internal refactoring of specs for speed and legibility
 * Update to duplicity 0.7.13.1
 * Update to poise-python 1.6 for Chef 13 support
