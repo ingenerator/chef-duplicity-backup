@@ -72,6 +72,9 @@ template "/etc/duplicity/backup.sh" do
   mode   0744
   owner  "root"
   group  "root"
+  variables({
+    commands: Ingenerator::DuplicityBackup::CommandBuilder.new(node)
+  })
 end
 
 # Environment variables to provide to duplicity (eg AWS keys)
