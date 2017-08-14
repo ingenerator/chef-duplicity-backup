@@ -4,6 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [BREAKING] Consistently use the **same** archive directory for every user.
+  Previously we were falling back to the default $HOME/.cache/duplicity but
+  this causes hassle when running occasional restore / backup manually. If you
+  deploy this to an existing instance, duplicity will have to fully re-sync its
+  local cached manifests and signatures on the next run. You can avoid this by
+  manually moving /root/.cache/duplicity to /var/duplicity/archive on the first
+  deployment.
 * [BREAKING] Disable `--allow-source-mismatch` for database backups. Previously
   we set this to allow use of a dynamic temporary directory for each backup.
   However, this also then allows backups to be overwritten from any host with
