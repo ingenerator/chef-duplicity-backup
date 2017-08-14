@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 4.0.0 (2017-08-15)
+
 * [FEATURE] Provision a simple restore script that allows restoring from
   any arbitrary source, or from one of the current instance backup
   destinations.
