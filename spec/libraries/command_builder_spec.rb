@@ -7,11 +7,11 @@ describe Ingenerator::DuplicityBackup::CommandBuilder do
   let(:commands) { Ingenerator::DuplicityBackup::CommandBuilder.new(node) }
 
   before(:each) do
-    node.normal['duplicity'] = {}
-    node.normal['duplicity']['mysql'] = {}
+    node.normal['duplicity']['archive_dir'] = '/var/dup/arch'
+    node.normal['duplicity']['mysql']       = {}
   end
 
-  shared_examples 'duplicity command with common s3 options' do
+  shared_examples 'duplicity command with common options' do
     it 'uses new-style s3 buckets' do
       expect_valid_command(subject).to include ' --s3-use-new-style '
     end
@@ -23,8 +23,19 @@ describe Ingenerator::DuplicityBackup::CommandBuilder do
 
     it 'uses s3-european-buckets if configured in node attributes' do
       node.normal['duplicity']['s3-european-buckets'] = true
-      expect_valid_command(subject).to include '--s3-european-buckets'
+      expect_valid_command(subject).to include ' --s3-european-buckets '
     end
+
+    it 'specifies the archive-dir' do
+      node.normal['duplicity']['archive_dir'] = '/var/duplicity/archives'
+      expect_valid_command(subject).to include ' --archive-dir="/var/duplicity/archives" '
+    end
+
+    it 'throws if the archive directory is not configured' do
+      node.rm('duplicity', 'archive_dir')
+      expect { subject }.to raise_error(Ingenerator::DuplicityBackup::IncompleteConfigError, /node.duplicity.archive_dir/)
+    end
+
   end
 
   shared_examples 'basic duplicity backup command' do |expect_source|
@@ -50,7 +61,7 @@ describe Ingenerator::DuplicityBackup::CommandBuilder do
         expect_valid_command(subject).to include ' --full-if-older-than 15D '
       end
 
-      it_behaves_like 'duplicity command with common s3 options'
+      it_behaves_like 'duplicity command with common options'
 
       it 'specifies the backup name' do
         expect_valid_command(subject).to include " --name #{backup_name} "
@@ -103,7 +114,7 @@ describe Ingenerator::DuplicityBackup::CommandBuilder do
         expect_valid_command(subject).to end_with ' "s3://some.bucket/path"'
       end
 
-      it_behaves_like 'duplicity command with common s3 options'
+      it_behaves_like 'duplicity command with common options'
     end
   end
 

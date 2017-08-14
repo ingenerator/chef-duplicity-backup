@@ -27,6 +27,15 @@ describe 'duplicity-backup::configure_backup' do
     )
   end
 
+  it 'creates a private duplicity archive directory' do
+    expect(chef_run).to create_directory('/var/duplicity/archive').with(
+      owner: 'root',
+      group: 'root',
+      recursive: true,
+      mode: 0o700
+    )
+  end
+
   describe 'creates a backup file list' do
     it 'writes the filelist with restricted permissions' do
       expect(chef_run).to create_template('/etc/duplicity/globbing_file_list').with(

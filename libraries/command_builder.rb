@@ -159,7 +159,7 @@ module Ingenerator
           '--force',
           "--name #{backup_name}"
         ]
-        parts.concat(duplicity_s3_options)
+        parts.concat(duplicity_common_options)
         parts.push('"' + job_destination(backup_name) + '"')
         format_command(parts)
       end
@@ -218,7 +218,7 @@ module Ingenerator
           "--full-if-older-than #{full_if_older_than}",
           "--name #{backup_name}"
         ]
-        parts.concat(duplicity_s3_options)
+        parts.concat(duplicity_common_options)
         parts.concat(extra_options)
         parts.push('"' + source_path + '"')
         parts.push('"' + job_destination(backup_name) + '"')
@@ -226,12 +226,15 @@ module Ingenerator
       end
 
       ##
-      # The S3-related command options relevant to all duplicity commands
+      # The options relevant to all duplicity commands
       #
       # @return [String]
       #
-      def duplicity_s3_options
-        options = ['--s3-use-new-style']
+      def duplicity_common_options
+        options = [
+          '--archive-dir="'+require_attribute!('duplicity.archive_dir')+'"',
+          '--s3-use-new-style'
+        ]
         if @node['duplicity']['s3-european-buckets']
           options << '--s3-european-buckets'
         end

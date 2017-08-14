@@ -49,6 +49,14 @@ directory "/etc/duplicity" do
   group  "root"
 end
 
+directory node['duplicity']['archive_dir'] do
+  action :create
+  recursive true
+  mode   0o700
+  owner  'root'
+  group  'root'
+end
+
 # The list of files to include or exclude
 template "/etc/duplicity/globbing_file_list" do
   action :create
