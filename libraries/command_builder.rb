@@ -32,6 +32,46 @@ module Ingenerator
       end
 
       ##
+      # Generate command to export a working directory path to a shell variable
+      #
+      # @param [String] the name of the variable that should be assigned
+      # @param [String] the backup name to create the working directory for
+      # @return [String]
+      #
+      def export_dump_dir(assign_varname, backup_name)
+        basedir = require_attribute! 'duplicity.dump_base_dir'
+        dirname = File.join(basedir, backup_name)
+        unless valid_dir? dirname
+          raise ArgumentError, "`#{dirname}` is not a valid dump working directory, check your duplicity.dump_base_dir attribute"
+        end
+
+        assign_varname+'="'+dirname+'"'
+      end
+
+      ##
+      # Generate command to ensure the working directory exists and is private
+      # - removes and recreates if required
+      #
+      # @param [String] the bash variable name holding the working directory
+      # @return [String]
+      #
+      def prepare_dump_dir(varname)
+        raise ArgumentError, "`#{varname}` not a variable name" unless /\A\$[A-Z_]+\z/ =~ varname
+        [
+          'rm -rf "'+varname+'"',
+          '&&',
+          'mkdir -p "'+varname+'"',
+          '&&',
+          'chmod 0700 "'+varname+'"'
+        ].join(' ')
+      end
+
+      def remove_dump_dir(varname)
+        raise ArgumentError, "`#{varname}` not a variable name" unless /\A\$[A-Z_]+\z/ =~ varname
+        'rm -rf "'+varname+'"'
+      end
+
+      ##
       # Generate command to mysqldump a single schema to a dump file
       #
       # @param [String] the shell variable pointing to the schema to backup
@@ -85,7 +125,7 @@ module Ingenerator
         duplicity_backup_cmd(
           from_dir,
           backup_name,
-          ['--allow-source-mismatch']
+          []
         )
       end
 
@@ -197,6 +237,17 @@ module Ingenerator
         end
         options
       end
+
+      ##
+      # Is this a valid path?
+      #
+      # Must be alphanumeric/-_ and be off the root, not relative
+      #
+      # @return [String]
+      def valid_dir?(path)
+        /\A\/[a-zA-Z0-9z\/\-\_]+\z/ =~ path
+      end
+
     end unless defined?(Ingenerator::DuplicityBackup::CommandBuilder)
     # The conditional declaration is required so that chef doesn't overwrite the
     # class during converge if we've already stubbed it from chefspec

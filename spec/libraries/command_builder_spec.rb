@@ -115,8 +115,8 @@ describe Ingenerator::DuplicityBackup::CommandBuilder do
 
     it_behaves_like 'basic duplicity backup command', '$anywhere'
 
-    it 'allows source mismatch' do
-      expect_valid_command(subject).to include ' --allow-source-mismatch '
+    it 'does not allow source mismatch' do
+      expect_valid_command(subject).not_to include ' --allow-source-mismatch '
     end
   end
 
@@ -210,6 +210,58 @@ describe Ingenerator::DuplicityBackup::CommandBuilder do
       let(:dest_attr)   { 'file_destination' }
 
       it_behaves_like 'remove_all_but_n_full for known backup'
+    end
+  end
+
+  describe '#export_dump_dir' do
+    let(:varname) { 'WORKDIR' }
+    let(:backup_name) { 'mysql_backup' }
+    let(:subject) { commands.export_dump_dir(varname, backup_name) }
+
+    context 'with invalid configuration' do
+      it 'fails if dump source directory is not configured' do
+        expect { subject }.to raise_error(Ingenerator::DuplicityBackup::IncompleteConfigError, /node.duplicity.dump_base_dir/)
+      end
+
+      ['relative', 'white space', 'end-whitespace '].each do |invalid|
+        it "fails if dump source directory is not valid eg `#{invalid}`" do
+          node.normal['duplicity']['dump_base_dir'] = invalid
+          expect { subject }.to raise_error ArgumentError, /not a valid dump/
+        end
+      end
+    end
+
+    context 'with valid configuration' do
+      it 'provides a path for the job name in the sources directory' do
+        node.normal['duplicity']['dump_base_dir'] = '/var/duplicity/sources'
+        expect(subject).to eq('WORKDIR="/var/duplicity/sources/mysql_backup"')
+      end
+    end
+  end
+
+  describe '#prepare_dump_dir' do
+    let(:varname)     { '$WORKDIR' }
+    let(:subject)     { commands.prepare_dump_dir(varname) }
+
+    it 'throws with invalid varname' do
+      expect { commands.prepare_dump_dir('NO_STRING') }.to raise_error ArgumentError, /not a variable name/
+    end
+
+    it 'force-removes an existing directory, recursively recreates and makes private' do
+      expect_valid_command(subject).to eq 'rm -rf "$WORKDIR" && mkdir -p "$WORKDIR" && chmod 0700 "$WORKDIR"'
+    end
+  end
+
+  describe '#remove_dump_dir' do
+    let(:varname)     { '$WORKDIR' }
+    let(:subject)     { commands.remove_dump_dir(varname) }
+
+    it 'throws with invalid varname' do
+      expect { commands.remove_dump_dir('NO_STRING') }.to raise_error ArgumentError, /not a variable name/
+    end
+
+    it 'force-removes the directory' do
+      expect_valid_command(subject).to eq 'rm -rf "$WORKDIR"'
     end
   end
 

@@ -100,6 +100,11 @@ describe 'duplicity-backup::configure_backup' do
           .with_content(/postgresql/i)
       end
 
+      it 'does not export a working directory by default' do
+        expect(chef_run).to_not render_file('/etc/duplicity/backup.sh')
+          .with_content(/export_dump_dir/i)
+      end
+
       context 'when mysql_backup is enabled' do
         before(:each) do
           chef_runner.node.normal['duplicity']['backup_mysql'] = true
@@ -109,14 +114,29 @@ describe 'duplicity-backup::configure_backup' do
 
         cached(:chef_run) { chef_runner.converge(described_recipe) }
 
+        it 'exports the working directory path' do
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh')
+            .with_content(/^\STUBCMD-export_dump_dir MYSQL_DUMP_DIR mysql_backup$/m)
+        end
+
+        it 'includes a prepare working directory command before the backup' do
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh')
+            .with_content(/^\STUBCMD-prepare_dump_dir \$MYSQL_DUMP_DIR$/m)
+        end
+
+        it 'includes a clean working directory command after the backup' do
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh')
+            .with_content(/^\STUBCMD-remove_dump_dir \$MYSQL_DUMP_DIR$/m)
+        end
+
         it 'includes a mysqldump command in the backup script' do
           expect(chef_run).to render_file('/etc/duplicity/backup.sh')
-            .with_content(/^\s*STUBCMD-mysqldump \$db \$MYSQLTMPDIR\/mysql-\$db.sql.gz$/m)
+            .with_content(/^\s*STUBCMD-mysqldump \$db \$MYSQL_DUMP_DIR\/mysql-\$db.sql.gz$/m)
         end
 
         it 'backs up the mysqldump directory' do
           expect(chef_run).to render_file('/etc/duplicity/backup.sh')
-            .with_content(/^\s*STUBCMD-duplicity_backup_dir \$MYSQLTMPDIR mysql_backup$/m)
+            .with_content(/^\s*STUBCMD-duplicity_backup_dir \$MYSQL_DUMP_DIR mysql_backup$/m)
         end
 
         it 'cleans old full mysql backups' do
@@ -135,17 +155,32 @@ describe 'duplicity-backup::configure_backup' do
 
         cached(:chef_run) { chef_runner.converge(described_recipe) }
 
+        it 'exports the working directory path' do
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh')
+            .with_content(/^\STUBCMD-export_dump_dir PG_DUMP_DIR pg_backup$/m)
+        end
+
+        it 'includes a prepare working directory command before the backup' do
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh')
+            .with_content(/^\STUBCMD-prepare_dump_dir \$PG_DUMP_DIR$/m)
+        end
+
         it 'includes a pg_dumpall command in the backup script' do
           expect(chef_run).to render_file('/etc/duplicity/backup.sh')
-            .with_content(/^\s*STUBCMD-pg_dumpall \$POSTGRESTMPDIR\/pgdump.sql.gz$/m)
+            .with_content(/^\s*STUBCMD-pg_dumpall \$PG_DUMP_DIR\/pgdump.sql.gz$/m)
         end
 
         it 'backs up the postgresql directory' do
           expect(chef_run).to render_file('/etc/duplicity/backup.sh')
-            .with_content(/^\s*STUBCMD-duplicity_backup_dir \$POSTGRESTMPDIR pg_backup$/m)
+            .with_content(/^\s*STUBCMD-duplicity_backup_dir \$PG_DUMP_DIR pg_backup$/m)
         end
 
-        it 'cleans old full mysql backups' do
+        it 'includes a clean working directory command after the backup' do
+          expect(chef_run).to render_file('/etc/duplicity/backup.sh')
+            .with_content(/^\s*STUBCMD-remove_dump_dir \$PG_DUMP_DIR$/m)
+        end
+
+        it 'cleans old full postgresql backups' do
           expect(chef_run).to render_file('/etc/duplicity/backup.sh')
             .with_content(/^\s*STUBCMD-duplicity_remove_all_but_n_full pg_backup$/m)
         end

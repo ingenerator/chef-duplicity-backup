@@ -24,6 +24,9 @@ default['duplicity']['src_url'] = 'https://code.launchpad.net/duplicity/0.7-seri
 # local directory to place the source in
 default['duplicity']['src_dir'] = '/usr/local/src'
 
+# Local directory path to dump database files for backup
+default['duplicity']['dump_base_dir'] = '/var/duplicity/sources'
+
 # globbing patterns for file backup
 default['duplicity']['globbing_file_patterns'] = node['duplicity']['globbing_file_patterns'] || {}
 

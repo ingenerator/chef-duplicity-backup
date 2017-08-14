@@ -100,9 +100,9 @@ Other attributes are available to provide more control - see the attributes file
 
 Configuring for backup to S3
 ----------------------------
-Our usual strategy is to backup to an S3 bucket for the project, with separate paths in the bucket for the database and file backups. If there
-are multiple servers with file backups then we'll use a different destination path for each role - but usually we're only interested in uploaded
-user content, custom instance configuration and databases as everything else on the instance is provisioned from source control.
+Our usual strategy is to backup to an S3 bucket for the project, with separate paths
+in the bucket for each instance, and separate paths below that for the database and
+file backups.
 
 To get this working:
 ### Create an S3 bucket for the backups
@@ -110,9 +110,9 @@ To get this working:
 Create a bucket on EC2 and store the destination in your role attributes. For a bucket `my-app-backup` you'll want to set:
 
 ```ruby
-node.default['duplicity']['file_destination'] = 's3+http://my-app-backup/files'
-node.default['duplicity']['db_destination'] = 's3+http://my-app-backup/database'
-node.default['duplicity']['pg_destination'] = 's3+http://my-app-backup/pg_database'
+node.default['duplicity']['file_destination'] = 's3+http://my-app-backup/'+node['fqdn']+'/files'
+node.default['duplicity']['db_destination'] = 's3+http://my-app-backup/'+node['fqdn']+'/database'
+node.default['duplicity']['pg_destination'] = 's3+http://my-app-backup/'+node['fqdn']+'/pg_database'
 ```
 
 **We default to setting the --s3-european-buckets flag for duplicity. This should work with buckets outside the EU as well, but

@@ -18,10 +18,15 @@ echo "Loading credentials and environment"
 source /etc/duplicity/environment.sh
 
 <% if node['duplicity']['backup_mysql'] %>
-echo "Creating mysql database dump"
+### mysql backup ###
+<%=@commands.export_dump_dir('MYSQL_DUMP_DIR', 'mysql_backup') %>
 
-# Create temp dir that only we can see
-MYSQLTMPDIR="$(mktemp -d)"
+echo "Creating mysql database dump in $MYSQL_DUMP_DIR"
+if [ -d $MYSQL_DUMP_DIR ]; then
+  (>&2 echo "CAUTION: $MYSQL_DUMP_DIR exists and will be wiped")
+fi
+
+<%=@commands.prepare_dump_dir('$MYSQL_DUMP_DIR') %>
 
 DBS="$(mysql --defaults-file=/etc/duplicity/mysql.cnf -h localhost -Bse 'show databases')"
 FOUND_DBS=""
@@ -37,7 +42,7 @@ do
       SCHEMA_BACKUP_FLAGS=""
     fi
 
-    <%=@commands.mysqldump('$db', '$MYSQLTMPDIR/mysql-$db.sql.gz') %>
+    <%=@commands.mysqldump('$db', '$MYSQL_DUMP_DIR/mysql-$db.sql.gz') %>
   fi
 done
 if [ -z "$FOUND_DBS" ]; then
@@ -47,9 +52,10 @@ if [ -z "$FOUND_DBS" ]; then
 fi
 
 echo "Backing up mysql database dump"
-<%=@commands.duplicity_backup_dir('$MYSQLTMPDIR', 'mysql_backup') %>
+<%=@commands.duplicity_backup_dir('$MYSQL_DUMP_DIR', 'mysql_backup') %>
 
-rm -rf "$MYSQLTMPDIR"
+echo "Removing local dump working directory"
+<%=@commands.remove_dump_dir('$MYSQL_DUMP_DIR') %>
 
 echo "Cleaning old mysql full database backups"
 <%=@commands.duplicity_remove_all_but_n_full('mysql_backup') %>
@@ -58,18 +64,21 @@ echo "Cleaning old mysql full database backups"
 
 <% if node['duplicity']['backup_postgresql'] %>
 ### PostgreSQL backup ###
+<%=@commands.export_dump_dir('PG_DUMP_DIR', 'pg_backup') %>
+if [ -d PG_DUMP_DIR ]; then
+  (>&2 echo "CAUTION: $PG_DUMP_DIR exists and will be wiped")
+fi
 
-echo "Creating postgresql database dump"
+echo "Creating postgresql database dump in $PG_DUMP_DIR"
+<%=@commands.prepare_dump_dir('$PG_DUMP_DIR') %>
 
-# Create temp dir that only we can see
-POSTGRESTMPDIR="$(mktemp -d)"
-
-<%=@commands.pg_dumpall('$POSTGRESTMPDIR/pgdump.sql.gz') %>
+<%=@commands.pg_dumpall('$PG_DUMP_DIR/pgdump.sql.gz') %>
 
 echo "Backing up postgresql database dump"
-<%=@commands.duplicity_backup_dir('$POSTGRESTMPDIR', 'pg_backup') %>
+<%=@commands.duplicity_backup_dir('$PG_DUMP_DIR', 'pg_backup') %>
 
-rm -rf "$POSTGRESTMPDIR"
+echo "Removing local dump working directory"
+<%=@commands.remove_dump_dir('$PG_DUMP_DIR') %>
 
 echo "Cleaning old postgresql full database backups"
 <%=@commands.duplicity_remove_all_but_n_full('pg_backup') %>
