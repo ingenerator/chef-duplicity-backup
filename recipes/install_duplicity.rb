@@ -23,6 +23,7 @@
 # Install the dependencies for build and for all the various backends
 python_runtime '2.7'
 python_package 'lockfile'
+python_package 'fasteners'
 package "ncftp"
 package "python-paramiko"
 package "python-pycryptopp"
