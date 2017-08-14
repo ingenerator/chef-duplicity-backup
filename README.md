@@ -209,6 +209,28 @@ node.default['duplicity']['postgresql']['user'] = 'backup_user'
 node.default['duplicity']['postgresql']['password'] = 'from-an-encrypted-data-bag'
 ```
 
+### Restoring your backups
+
+As part of provisioning, a restore script will be dropped off at /etc/duplicity/restore.sh.
+
+There are essentially two usecases:
+
+* to restore content on the same instance where it was originally backed up,
+  you should run the script with a source of `files`, `mysql` etc. This will
+  allow reuse of the current local archive data for a significantly faster  
+  restore, and automatically look up the remote source.
+
+* to restore a content on a brand-new instance eg following system failure.
+  For this case, provision any new instance with this cookbook, the same
+  passphrase, etc. Then just run `sudo /etc/duplicity/restore.sh s3+http://bucket/path/to/restore`
+
+You can pass any list of duplicity restore arguments (eg to recover an
+earlier version, or restore only a few files).
+
+The backup will be restored to a standalone local path - you should review
+this path for consistency and then rsync or similar into the real system
+locations.
+
 ### Testing
 See the [.travis.yml](.travis.yml) file for the current test scripts.
 

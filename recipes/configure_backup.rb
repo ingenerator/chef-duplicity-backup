@@ -100,3 +100,14 @@ template "/etc/duplicity/.pgpass" do
   owner  "root"
   group  "root"
 end
+
+# A quick-start restore script that can restore any expected backup
+template "/etc/duplicity/restore.sh" do
+  action :create
+  mode   0744
+  owner  "root"
+  group  "root"
+  variables({
+    commands: Ingenerator::DuplicityBackup::CommandBuilder.new(node)
+  })
+end

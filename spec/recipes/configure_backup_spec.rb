@@ -284,6 +284,85 @@ describe 'duplicity-backup::configure_backup' do
     end
   end
 
+  describe 'creates a restore script' do
+    it 'writes the restore script with restricted permissions' do
+      expect(chef_run).to create_template('/etc/duplicity/restore.sh').with(
+        owner: 'root',
+        group: 'root',
+        mode: 0o744
+      )
+    end
+
+    it 'generates commands OK with the real helper' do
+      expect(chef_run).to render_file('/etc/duplicity/restore.sh')
+        .with_content("/usr/local/bin/duplicity restore \\\n")
+    end
+
+    it 'allows restore from `files` as file_backup from file_destination' do
+      expect(chef_run).to render_file('/etc/duplicity/restore.sh')
+        .with_content(
+          restore_source_pattern('files', 's3+http://ourbackup/filebackup', 'file_backup')
+        )
+    end
+
+    it 'does not include mysql or postgresql option by default' do
+      expect(chef_run)
+        .to(
+          render_file('/etc/duplicity/restore.sh')
+          .with_content do |content|
+            expect(content).not_to include 'mysql_backup'
+            expect(content).not_to include 'pg_backup'
+          end
+        )
+    end
+
+    context 'when backup_mysql is enabled' do
+      before(:each) do
+        chef_runner.node.normal['duplicity']['backup_mysql'] = true
+        chef_runner.node.normal['duplicity']['mysql']['password'] = '12345678'
+        chef_runner.node.normal['duplicity']['db_destination'] = 's3://my.bucket/db'
+      end
+
+      it 'allows restore from `mysql` as mysql_backup from db_destination' do
+        expect(converge).to render_file('/etc/duplicity/restore.sh')
+          .with_content(
+            restore_source_pattern('mysql', 's3://my.bucket/db', 'mysql_backup')
+          )
+      end
+    end
+
+    context 'when backup_postgresql is enabled' do
+      before(:each) do
+        chef_runner.node.normal['duplicity']['backup_postgresql'] = true
+        chef_runner.node.normal['duplicity']['postgresql']['user'] = 'backup'
+        chef_runner.node.normal['duplicity']['postgresql']['password'] = '12345678'
+        chef_runner.node.normal['duplicity']['pg_destination'] = 's3://my.bucket/pgb'
+      end
+
+      it 'allows restore from `postgresql` as pg_backup from pg_destination' do
+        expect(converge).to render_file('/etc/duplicity/restore.sh')
+          .with_content(
+            restore_source_pattern('postgresql', 's3://my.bucket/pgb', 'pg_backup')
+          )
+      end
+    end
+
+    context 'with stubbed command builder' do
+      before(:each) do
+        stub_command_builder
+      end
+
+      cached(:chef_run) { chef_runner.converge(described_recipe) }
+
+      it 'includes the restore command with runtime arguments' do
+        expect(chef_run).to render_file('/etc/duplicity/restore.sh')
+          .with_content(
+            /^STUBCMD-duplicity_restore \$BACKUP_NAME \$RESTORE_OPTIONS \$BACKUP_SOURCE \$RESTORE_TO$/m
+          )
+      end
+    end
+  end
+
   def converge
     chef_runner.converge(described_recipe)
   end
@@ -294,5 +373,17 @@ describe 'duplicity-backup::configure_backup' do
       allow_any_instance_of(Ingenerator::DuplicityBackup::CommandBuilder)
         .to receive(method) { |_inst, *args| args.unshift("STUBCMD-#{method}").join(' ') }
     end
+  end
+
+  def restore_source_pattern(argument, source, backup_name)
+    Regexp.new([
+      '\n\s+',
+      Regexp.escape("'#{argument}'*)"),
+      '\n\s+',
+      'BACKUP_SOURCE="' + Regexp.escape(source) + '"',
+      '\n\s+',
+      'BACKUP_NAME="--name ' + backup_name + '"',
+      '\n\s+'
+    ].join)
   end
 end
