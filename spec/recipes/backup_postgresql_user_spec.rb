@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'duplicity-backup::backup_postgresql_user' do
   context "when postgresql backup is enabled" do
     cached (:chef_run) do
-      ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '12.04') do | node |
+      ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '14.04') do | node |
         # Set non-standard attributes to check the recipe is using the attributes
         node.normal['duplicity']['backup_postgresql']     = true
         node.normal['duplicity']['postgresql']['user']       = 'backup'

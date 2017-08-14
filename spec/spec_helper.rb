@@ -11,4 +11,7 @@ RSpec.configure do |c|
   c.platform = 'ubuntu'
   c.version = '14.04'
 
+  # Don't clear cookbooks from the server-runner between each test for performance
+  c.server_runner_clear_cookbooks = false
+
 end

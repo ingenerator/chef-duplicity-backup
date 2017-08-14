@@ -1,13 +1,15 @@
 require 'spec_helper'
 
 describe 'duplicity-backup::install_duplicity' do
-  cached (:chef_run) do
+  let (:chef_runner) do
     ChefSpec::SoloRunner.new do | node |
       # Set non-standard attributes to check the recipe is using the attributes
       node.normal['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.22/+download/duplicity-0.6.22.tar.gz'
       node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
-    end.converge(described_recipe)
+    end
   end
+
+  cached (:chef_run) { chef_runner.converge(described_recipe) }
 
   it "installs python 2 with pip" do
     expect(chef_run).to install_python_runtime('2.7').with(
@@ -80,16 +82,10 @@ describe 'duplicity-backup::install_duplicity' do
       allow(Kernel).to receive(:system).with('which duplicity > /dev/null').and_return(true)
     end
 
-    cached (:chef_run) do
-      ChefSpec::SoloRunner.new do | node |
-        # Set non-standard attributes to check the recipe is using the attributes
-        node.normal['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.22/+download/duplicity-0.6.22.tar.gz'
-        node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
-      end.converge(described_recipe)
-    end
+    cached (:chef_run) { chef_runner.converge(described_recipe) }
 
     it "does not attempt to unpack and build the source" do
-      expect(chef_run).not_to run_execute('install-duplicity')
+      expect(chef_runner.converge(described_recipe)).not_to run_execute('install-duplicity')
     end
   end
 
@@ -98,13 +94,7 @@ describe 'duplicity-backup::install_duplicity' do
       allow(Kernel).to receive(:system).with('which duplicity > /dev/null').and_return(false)
     end
 
-    cached (:chef_run) do
-      ChefSpec::SoloRunner.new do | node |
-        # Set non-standard attributes to check the recipe is using the attributes
-        node.normal['duplicity']['src_url'] = 'http://code.launchpad.net/duplicity/0.6-series/0.6.22/+download/duplicity-0.6.22.tar.gz'
-        node.normal['duplicity']['src_dir'] = '/usr/local/othersrc'
-      end.converge(described_recipe)
-    end
+    cached (:chef_run) { chef_runner.converge(described_recipe) }
 
     it "compiles and installs from source" do
       expect(chef_run).to run_execute('install-duplicity')

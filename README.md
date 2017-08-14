@@ -1,6 +1,6 @@
 inGenerator Backup cookbook
 =================================
-[![Build Status](https://travis-ci.org/ingenerator/chef-duplicity-backup.png?branch=master)](https://travis-ci.org/ingenerator/chef-duplicity-backup)
+[![Build Status](https://travis-ci.org/ingenerator/chef-duplicity-backup.png?branch=4.0.x)](https://travis-ci.org/ingenerator/chef-duplicity-backup)
 
 `duplicity-backup` installs and configures [duplicity](http://duplicity.nongnu.org/) to handle remote backup of files
 and/or databases on a server. It also installs [lockrun](http://www.unixwiz.net/tools/lockrun.html) and
@@ -8,7 +8,7 @@ uses this to ensure that your duplicity runs never overlap (which can cause reso
 
 Requirements
 ------------
-- Chef 11 or higher
+- Chef 12.18 or higher
 - **Ruby 1.9.3 or higher**
 
 Installation
@@ -16,7 +16,8 @@ Installation
 We recommend adding to your `Berksfile` and using [Berkshelf](http://berkshelf.com/):
 
 ```ruby
-cookbook 'duplicity-backup', git: 'git://github.com/ingenerator/chef-duplicity-backup', branch: 'master'
+source 'https://chef-supermarket.ingenerator.com'
+cookbook 'duplicity-backup', '~>4.0'
 ```
 
 Have your main project cookbook *depend* on duplicity-backup by editing the `metadata.rb` for your cookbook.
