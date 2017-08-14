@@ -4,7 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-* Extracted backup command generation from the template to a custom helper, 
+* [BREAKING] Disable `--allow-source-mismatch` for database backups. Previously
+  we set this to allow use of a dynamic temporary directory for each backup.
+  However, this also then allows backups to be overwritten from any host with
+  the same configuration. Instead, database dumps are now always sent to the
+  same path (which will be wiped and recreated each time) and duplicity will
+  fail if the backup source (path or host) has changed at a given destination.
+* Extracted backup command generation from the template to a custom helper,
   and refactored specs for the configure_backup recipe to stub the helper
   and reflect the new responsibilities. This allows for clearer and more
   rigorous specification of individual commands rather than having all the
