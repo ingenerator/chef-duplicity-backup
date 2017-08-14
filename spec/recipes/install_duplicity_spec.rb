@@ -22,6 +22,10 @@ describe 'duplicity-backup::install_duplicity' do
     expect(chef_run).to install_python_package 'lockfile'
   end
 
+  it "installs the pip fasteners package" do
+    expect(chef_run).to install_python_package 'fasteners'
+  end
+
   it "installs ncftp" do
     expect(chef_run).to install_package "ncftp"
   end
