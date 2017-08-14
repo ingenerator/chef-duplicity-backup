@@ -164,6 +164,27 @@ module Ingenerator
         format_command(parts)
       end
 
+      ##
+      # Generate command to run a restore with optional additional arguments
+      #
+      # @param [String] shell variable with the backup job name
+      # @param [String] shell variable with any extra options to duplicity
+      # @param [String] shell variable with source to restore from
+      # @param [String] shell variable with path to restore to
+      # @return [String]
+      #
+      def duplicity_restore(name_arg, options_arg, source_arg, dest_arg)
+        parts = [
+          '/usr/local/bin/duplicity restore',
+          name_arg,
+          options_arg
+        ]
+        parts.concat(duplicity_common_options)
+        parts.push('"' + source_arg + '"')
+        parts.push('"' + dest_arg + '"')
+        format_command(parts)
+      end
+
       private
 
       ##

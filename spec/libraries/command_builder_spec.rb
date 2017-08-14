@@ -224,6 +224,33 @@ describe Ingenerator::DuplicityBackup::CommandBuilder do
     end
   end
 
+  describe '#duplicity_restore' do
+    let(:name_arg)   { '$NAME'}
+    let(:options)    { '$EXTRA_OPTIONS'}
+    let(:source_arg) { '$SOURCE'}
+    let(:dest_arg)   {'$DEST'}
+    let(:subject)    { commands.duplicity_restore(name_arg, options, source_arg, dest_arg) }
+
+    it_behaves_like 'duplicity command with common options'
+
+    it 'produces a duplicity restore command' do
+      expect_valid_command(subject).to start_with '/usr/local/bin/duplicity restore'
+    end
+
+    it 'includes the name option as an unquoted command part' do
+      expect_valid_command(subject).to include ' $NAME '
+    end
+
+    it 'includes the restore options as an unquoted command part' do
+      expect_valid_command(subject).to include ' $EXTRA_OPTIONS '
+    end
+
+    it 'includes the backup source and destination arguments' do
+      expect_valid_command(subject).to end_with ' "$SOURCE" \\'+"\n"+'  "$DEST"'
+    end
+
+  end
+
   describe '#export_dump_dir' do
     let(:varname) { 'WORKDIR' }
     let(:backup_name) { 'mysql_backup' }

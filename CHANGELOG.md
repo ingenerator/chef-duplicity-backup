@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [FEATURE] Provision a simple restore script that allows restoring from
+  any arbitrary source, or from one of the current instance backup
+  destinations.
 * [BREAKING] Consistently use the **same** archive directory for every user.
   Previously we were falling back to the default $HOME/.cache/duplicity but
   this causes hassle when running occasional restore / backup manually. If you
