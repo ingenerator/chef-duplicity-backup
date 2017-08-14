@@ -20,26 +20,17 @@
 # limitations under the License.
 #
 
-# Validate the attributes
-required_attributes = %w{ backup_passphrase file_destination keep_n_full full_if_older_than }
+# Validate the attributes (most are now validated in the CommandBuilder helpers)
+Ingenerator::DuplicityBackup.require_attribute!(node, 'duplicity.backup_passphrase')
+
 if node['duplicity']['backup_mysql'] then
-  required_attributes << 'db_destination'
-
-  %w{ user password }.each do | key |
-    raise ArgumentError, "You must set node['duplicity']['mysql']['#{key}']" unless node['duplicity']['mysql'][key]
-  end
-
+  Ingenerator::DuplicityBackup.require_attribute!(node, 'duplicity.mysql.user')
+  Ingenerator::DuplicityBackup.require_attribute!(node, 'duplicity.mysql.password')
 end
+
 if node['duplicity']['backup_postgresql'] then
-  required_attributes << 'pg_destination'
-
-  %w{ user password }.each do | key |
-    raise ArgumentError, "You must set node['duplicity']['postgresql']['#{key}']" unless node['duplicity']['postgresql'][key]
-  end
-
-end
-required_attributes.each do | key |
-  raise ArgumentError, "You must set node['duplicity']['#{key}']" unless node['duplicity'][key]
+  Ingenerator::DuplicityBackup.require_attribute!(node, 'duplicity.postgresql.user')
+  Ingenerator::DuplicityBackup.require_attribute!(node, 'duplicity.postgresql.password')
 end
 
 node['duplicity']['globbing_file_patterns'].each do | pattern, is_active |

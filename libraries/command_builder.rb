@@ -13,17 +13,6 @@ module Ingenerator
     end
 
     ##
-    # Thrown if one or more config variables for a given backup aren't present
-    # or have empty values.
-    # - eg the backup destination for a given backup is not set
-    #
-    class IncompleteConfigError < RuntimeError
-      def initialize(attr_path)
-        super "You must specify a value for node.#{attr_path}"
-      end
-    end
-
-    ##
     # Thrown if attempting to generate commands for an undefined backup job name
     # Currently the available jobs are hardcoded in the cookbook, so this is an
     # internal logic error, or an attempt to use the library in an unsupported
@@ -171,13 +160,7 @@ module Ingenerator
       # @return [String]
       #
       def require_attribute!(attribute_path)
-        keys = attribute_path.split('.')
-        value = keys.inject(@node.attributes) do |attributes, key|
-          attributes[key] if attributes && attributes.key?(key)
-        end
-
-        raise IncompleteConfigError, attribute_path unless value
-        value
+        Ingenerator::DuplicityBackup.require_attribute! @node, attribute_path
       end
 
       ##
@@ -214,6 +197,8 @@ module Ingenerator
         end
         options
       end
-    end
+    end unless defined?(Ingenerator::DuplicityBackup::CommandBuilder)
+    # The conditional declaration is required so that chef doesn't overwrite the
+    # class during converge if we've already stubbed it from chefspec
   end
 end
