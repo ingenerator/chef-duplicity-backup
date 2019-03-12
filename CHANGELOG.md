@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [BUG] Don't allow the mysql handler to attempt to backup the `sys` schema : 
+  it causes problems with permissions
+
 ## 4.0.0 (2017-08-15)
 
 * [FEATURE] Provision a simple restore script that allows restoring from
