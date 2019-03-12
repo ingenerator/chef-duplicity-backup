@@ -18,4 +18,6 @@ depends 'poise-python', '~> 1.6'
 # express that at the moment per https://github.com/berkshelf/semverse/issues/10
 depends 'database', '> 5.1'
 depends 'monitored-cron', '~> 0.1'
-depends 'postgresql'
+# postgres was updated in 7.0.0 to remove all the recipes. NB that the changelog says "deprecated" but in fact they're
+# all just deleted....
+depends 'postgresql', '< 7.0.0'
