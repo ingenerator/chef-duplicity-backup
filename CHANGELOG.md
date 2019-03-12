@@ -4,6 +4,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 4.1.0 (2019-03-12)
+
+* [DEPS] Pin seven_zip to a version that works for Chef12 in our berksfile - this shouldn't
+  affect external dependencies, but only apply to testing?
+* [DEPS] Mark not compatible with postgresql cookbook 7.0 and above - they deleted
+  all the recipes (described in the changelog as 'deprecated' but actually outright gone)
+* [BUG] Don't allow the mysql handler to attempt to backup the `sys` schema : 
+  it causes problems with permissions
+
 ## 4.0.0 (2017-08-15)
 
 * [FEATURE] Provision a simple restore script that allows restoring from

@@ -5,7 +5,7 @@ license 'Apache-2.0'
 chef_version '>=12.18.31'
 description 'Installs and configures duplicity for remote backup'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '4.0.0'
+version '4.1.0'
 issues_url 'https://github.com/ingenerator/chef-duplicity-backup/issues'
 source_url 'https://github.com/ingenerator/chef-duplicity-backup'
 
@@ -18,4 +18,6 @@ depends 'poise-python', '~> 1.6'
 # express that at the moment per https://github.com/berkshelf/semverse/issues/10
 depends 'database', '> 5.1'
 depends 'monitored-cron', '~> 0.1'
-depends 'postgresql'
+# postgres was updated in 7.0.0 to remove all the recipes. NB that the changelog says "deprecated" but in fact they're
+# all just deleted....
+depends 'postgresql', '< 7.0.0'

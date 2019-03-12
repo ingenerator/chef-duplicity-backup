@@ -32,7 +32,7 @@ DBS="$(mysql --defaults-file=/etc/duplicity/mysql.cnf -h localhost -Bse 'show da
 FOUND_DBS=""
 for db in $DBS
 do
-  if [ "$db" != "information_schema" ]; then
+  if [ "$db" != "information_schema" ] && [ "$db" != "sys" ]; then
     echo " * Dumping mySQL database $db"
     FOUND_DBS="$FOUND_DBS, $db"
 
