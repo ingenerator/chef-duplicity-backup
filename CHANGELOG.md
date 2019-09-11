@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+* [UPSTREAM BUG] Workaround for https://github.com/poise/poise-python/issues/146 which causes pip install to fail on
+  the current debian python version of 2.7.15+ - as the cookbook is abandoned it's unlikely this will be fixed upstream.
+
 ## 4.1.0 (2019-03-12)
 
 * [DEPS] Pin seven_zip to a version that works for Chef12 in our berksfile - this shouldn't
