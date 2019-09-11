@@ -21,7 +21,13 @@
 #
 
 # Install the dependencies for build and for all the various backends
-python_runtime '2.7'
+python_runtime '2.7' do
+  # This is a workaround for https://github.com/poise/poise-python/issues/146, by using a custom get_pip_url we skip
+  # the internal check to see if the url needs to be switched to a python 2.6 compatible one. That in turn avoids
+  # poise-python attempting to parse an operating system package version as a gem version string, which currently
+  # throws an exception as the debian python version 2.7.15+ is not a valid gem version.
+  get_pip_url 'https://bootstrap.pypa.io/get-pip.py#skip-poise-python-2.6-check'
+end
 python_package 'lockfile'
 python_package 'fasteners'
 package "ncftp"

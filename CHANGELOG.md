@@ -2,7 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 4.1.1 (2019-09-11)
+
+* [UPSTREAM BUG] Workaround for https://github.com/poise/poise-python/issues/146 which causes pip install to fail on
+  the current debian python version of 2.7.15+ - as the cookbook is abandoned it's unlikely this will be fixed upstream.
 
 ## 4.1.0 (2019-03-12)
 
