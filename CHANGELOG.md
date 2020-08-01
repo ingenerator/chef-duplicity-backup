@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+# 4.1.2 (2020-08-01)
+
+* [UPSTREAM BUG] Mysql >= 5.7.31 introduces a new requirement for the backup user to have the `PROCESS` privilege :
+  backups will fail without it. https://dev.mysql.com/doc/relnotes/mysql/5.7/en/news-5-7-31.html and 
+  https://bugs.mysql.com/bug.php?id=100219.
+
 ## 4.1.1 (2019-09-11)
 
 * [UPSTREAM BUG] Workaround for https://github.com/poise/poise-python/issues/146 which causes pip install to fail on

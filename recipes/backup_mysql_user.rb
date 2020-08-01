@@ -33,7 +33,7 @@ if node['duplicity']['backup_mysql'] then
     connection    root_connection
     host          'localhost'
     password      node['duplicity']['mysql']['password']
-    privileges    ['SELECT', 'SHOW VIEW', 'TRIGGER', 'LOCK TABLES', 'EVENT']
+    privileges    ['PROCESS', 'SELECT', 'SHOW VIEW', 'TRIGGER', 'LOCK TABLES', 'EVENT']
   end
   
 end
