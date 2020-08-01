@@ -32,7 +32,7 @@ describe 'duplicity-backup::backup_mysql_user' do
     it "should grant global read-only backup privileges to the user" do
       expect(chef_run).to grant_mysql_database_user('backup').with(
         :database_name  => nil,
-        :privileges     => ['SELECT', 'SHOW VIEW', 'TRIGGER', 'LOCK TABLES', 'EVENT']
+        :privileges     => ['PROCESS', 'SELECT', 'SHOW VIEW', 'TRIGGER', 'LOCK TABLES', 'EVENT']
       )
     end
 
