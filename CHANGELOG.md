@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+# 4.1.3 (2021-04-02)
+
+* [BUG] Pin the pypi get_pip URL for python 2.7 (pypa is evidently now 
+  returning a newer / incompatible version by default)
+
 # 4.1.2 (2020-08-01)
 
 * [UPSTREAM BUG] Mysql >= 5.7.31 introduces a new requirement for the backup user to have the `PROCESS` privilege :

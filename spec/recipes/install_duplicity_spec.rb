@@ -13,7 +13,7 @@ describe 'duplicity-backup::install_duplicity' do
 
   it "installs python 2 with pip" do
     expect(chef_run).to install_python_runtime('2.7').with(
-      get_pip_url: 'https://bootstrap.pypa.io/get-pip.py#skip-poise-python-2.6-check',
+      get_pip_url: 'https://bootstrap.pypa.io/pip/2.7/get-pip.py#skip-poise-python-2.6-check',
       pip_version: true,
       setuptools_version: true
     )
